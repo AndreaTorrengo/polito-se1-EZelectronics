@@ -6,7 +6,7 @@ Version: V1 - description of EZElectronics in CURRENT form (as received by teach
 
 | Version number | Change |
 | :------------: | :----: |
-|                |        |
+|       1        |        |
 
 # Contents
 
@@ -39,122 +39,409 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 
 # Stakeholders
 
-| Stakeholder name | Description |
-| :--------------: | :---------: |
-| Stakeholder x..  |             |
+| Stakeholder name |             Description             |
+| :--------------: | :---------------------------------: |
+|     Manager      |        EZElectronics Manager        |
+|     Customer     |       EZElectronics Customer        |
+|    SW factory    | Developers of EZelectronics website |
 
 # Context Diagram and interfaces
 
 ## Context Diagram
 
-\<Define here Context diagram using UML use case diagram>
-
-\<actors are a subset of stakeholders>
+![Alt text](./images/ContextDiagramV1.png)
 
 ## Interfaces
 
-\<describe here each interface in the context diagram>
-
-\<GUIs will be described graphically in a separate document>
-
-|   Actor   | Logical Interface | Physical Interface |
-| :-------: | :---------------: | :----------------: |
-| Actor x.. |                   |                    |
+|  Actor   |                         Logical Interface                          | Physical Interface |
+| :------: | :----------------------------------------------------------------: | :----------------: |
+| Customer |                      GUI (standard features)                       |         PC         |
+| Manager  | GUI (standard features and insert/update/delete products for sale) |         PC         |
 
 # Stories and personas
 
-\<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
-
-\<Persona is-an-instance-of actor>
-
-\<stories will be formalized later as scenarios in use cases>
+1. A 45 years old man is the manager of EZelectronics store, and wants to expand his business, so he decides to sell his products online
+2. A woman, age 32, is really busy with work and to spare time, decides that she is going to buy products she needs online
+3. A university student, age 22, with many passions and projects, decides to try buying online for a wide choice of products at affordable prices
 
 # Functional and non functional requirements
 
 ## Functional Requirements
 
-\<In the form DO SOMETHING, or VERB NOUN, describe high level capabilities of the system>
-
-\<they match to high level use cases>
-
-|  ID   | Description |
-| :---: | :---------: |
-|  FR1  |             |
-|  FR2  |             |
-| FRx.. |             |
+|  ID   |                           Description                           |
+| :---: | :-------------------------------------------------------------: |
+|  FR1  |               Users management and authentication               |
+| FR1.1 |                              Login                              |
+| FR1.2 |                             Logout                              |
+| FR1.3 |                             Signup                              |
+| FR1.4 |  Account management (creation, edit, delete, role definition)   |
+|  FR2  |                       Product management                        |
+| FR2.1 |                   Add/remove a single product                   |
+| FR2.2 |       Registers the arrival of a new (set of) product(s)        |
+| FR2.3 |                     Marks a product as sold                     |
+| FR2.4 |                      Returns all products.                      |
+| FR2.5 | Returns all products of a specific category/of a specific model |
+| FR2.6 |                  Returns a product by its code                  |
+|  FR3  |                         Cart management                         |
+| FR3.1 |            Add/remove product given its ID from cart            |
+| FR3.2 |                   Checks out the user's cart                    |
+| FR3.3 |        View purchased carts history for a specific user         |
+| FR3.4 |               Delete a specific cart given its ID               |
+| FR3.5 |                       View cart products                        |
 
 ## Non Functional Requirements
 
-\<Describe constraints on functional requirements>
+|  ID  | Type (efficiency, reliability, ..) |                                                 Description                                                  | Refers to |
+| :--: | :--------------------------------: | :----------------------------------------------------------------------------------------------------------: | :-------: |
+| NFR1 |             Usability              |                                         Users must not need training                                         |  All FR   |
+| NFR2 |             Efficiency             |                                All app features must be completed under 0.1s                                 |  All FR   |
+| NFR3 |            Reliability             |                               Users must not report more than one bug per year                               |  All FR   |
+| NFR4 |            Portability             | Mobile app must be compatible for the following browsers: Chrome v64.0.3282, Firefox v57.0.4, Safari v12.0.1 |  All FR   |
 
-|   ID    | Type (efficiency, reliability, ..) | Description | Refers to |
-| :-----: | :--------------------------------: | :---------: | :-------: |
-|  NFR1   |                                    |             |           |
-|  NFR2   |                                    |             |           |
-|  NFR3   |                                    |             |           |
-| NFRx .. |                                    |             |           |
+# Table of rights
+
+| Requirement | Customer | Manager | All |
+| :---------: | :------: | :-----: | :-: |
+|     F1      |          |         |  x  |
+|    F1.1     |          |         |  x  |
+|    F1.2     |          |         |  x  |
+|    F1.3     |          |         |  x  |
+|    F1.4     |          |         |  x  |
+|     F2      |          |    x    |     |
+|    F2.1     |          |    x    |     |
+|    F2.2     |          |    x    |     |
+|    F2.3     |          |    x    |     |
+|    F2.4     |          |         |  x  |
+|    F2.5     |          |         |  x  |
+|    F2.6     |          |         |  x  |
+|     F3      |    x     |         |     |
+|    F3.1     |    x     |         |     |
+|    F3.2     |    x     |         |     |
+|    F3.3     |    x     |         |     |
+|    F3.4     |    x     |         |     |
+|    F3.5     |    x     |         |     |
 
 # Use case diagram and use cases
 
 ## Use case diagram
 
-\<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
+![Alt text](./images/UseCaseDiagramV1.png)
 
-\<next describe here each use case in the UCD>
+### Use case 1, UC1: User Login
 
-### Use case 1, UC1
-
-| Actors Involved  |                                                                      |
-| :--------------: | :------------------------------------------------------------------: |
-|   Precondition   | \<Boolean expression, must evaluate to true before the UC can start> |
-|  Post condition  |  \<Boolean expression, must evaluate to true after UC is finished>   |
-| Nominal Scenario |         \<Textual description of actions executed by the UC>         |
-|     Variants     |                      \<other normal executions>                      |
-|    Exceptions    |                        \<exceptions, errors >                        |
+| Actors Involved  |                  User                  |
+| :--------------: | :------------------------------------: |
+|   Precondition   | User is not logged in, user registered |
+|  Post condition  |           User is logged in            |
+| Nominal Scenario |              Scenario 1.1              |
+|     Variants     |                  None                  |
+|    Exceptions    |         Scenario 1.2, 1.3, 1.4         |
 
 ##### Scenario 1.1
 
 \<describe here scenarios instances of UC1>
-
 \<a scenario is a sequence of steps that corresponds to a particular execution of one use case>
-
 \<a scenario is a more formal description of a story>
-
 \<only relevant scenarios should be described>
 
-|  Scenario 1.1  |                                                                            |
-| :------------: | :------------------------------------------------------------------------: |
-|  Precondition  | \<Boolean expression, must evaluate to true before the scenario can start> |
-| Post condition |  \<Boolean expression, must evaluate to true after scenario is finished>   |
-|     Step#      |                                Description                                 |
-|       1        |                                                                            |
-|       2        |                                                                            |
-|      ...       |                                                                            |
+|  Scenario 1.1  |                                            Login                                             |
+| :------------: | :------------------------------------------------------------------------------------------: |
+|  Precondition  |                             User not logged in, user registered                              |
+| Post condition |                                        User logged in                                        |
+|     Step#      |                                         Description                                          |
+|       1        |                              System: ask username and password                               |
+|       2        |                         User: provide correct username and password                          |
+|       3        |                         System: read provided username and password                          |
+|       4        | System: retrieve username and password stored on database and compare with the ones provided |
+|       5        |                  System: username and password match, user is authenticated                  |
 
 ##### Scenario 1.2
 
-##### Scenario 1.x
+|  Scenario 1.2  |                                        Wrong password                                        |
+| :------------: | :------------------------------------------------------------------------------------------: |
+|  Precondition  |                             User not logged in, user registered                              |
+| Post condition |                                      User not logged in                                      |
+|     Step#      |                                         Description                                          |
+|       1        |                              System: ask username and password                               |
+|       2        |                              User: provide username or password                              |
+|       3        |                         System: read provided username and password                          |
+|       4        | System: retrieve username and password stored on database and compare with the ones provided |
+|       5        |            System: username and password do not match, user is not authenticated             |
 
-### Use case 2, UC2
+##### Scenario 1.3
 
-..
+|  Scenario 1.3  |                                    User is not registered                                    |
+| :------------: | :------------------------------------------------------------------------------------------: |
+|  Precondition  |                           User not logged in, user not registered                            |
+| Post condition |                                      User not logged in                                      |
+|     Step#      |                                         Description                                          |
+|       1        |                              System: ask username and password                               |
+|       2        |                             User: provide username and password                              |
+|       3        |                         System: read provided username and password                          |
+|       4        | System: retrieve username and password stored on database and compare with the ones provided |
+|       5        |                   System: username is not found, user is not authenticated                   |
 
-### Use case x, UCx
+##### Scenario 1.4
 
-..
+|  Scenario 1.4  |           User already logged in            |
+| :------------: | :-----------------------------------------: |
+|  Precondition  |       User logged in, user registered       |
+| Post condition |               User logged in                |
+|     Step#      |                 Description                 |
+|       1        |      System: ask username and password      |
+|       2        |     User: provide username and password     |
+|       3        | System: read provided username and password |
+|       4        |       System: return an error message       |
+
+### Use case 2, UC2: User registration
+
+| Actors Involved  |                 User                 |
+| :--------------: | :----------------------------------: |
+|   Precondition   |        User is not registered        |
+|  Post condition  | User is registered and authenticated |
+| Nominal Scenario |             Scenario 2.1             |
+|     Variants     |                 None                 |
+|    Exceptions    |             Scenario 2.2             |
+
+##### Scenario 2.1
+
+|  Scenario 2.1  |                                    Registration                                     |
+| :------------: | :---------------------------------------------------------------------------------: |
+|  Precondition  |                               User is not registered                                |
+| Post condition |                                   User registered                                   |
+|     Step#      |                                     Description                                     |
+|       1        |                    User: ask to register as customer or manager                     |
+|       2        |                          System: ask username and password                          |
+|       3        |                         User: provide username and password                         |
+|       4        |                     System: read provided username and password                     |
+|       5        | System: check if provided username has not already been used in another account yet |
+|       6        |  System: username has not been used yet, user is registered, store his information  |
+
+##### Scenario 2.2
+
+|  Scenario 2.2  |                             Username already registered                             |
+| :------------: | :---------------------------------------------------------------------------------: |
+|  Precondition  |                                   User registered                                   |
+| Post condition |                                 Registration failed                                 |
+|     Step#      |                                     Description                                     |
+|       1        |                    User: ask to register as customer or manager                     |
+|       2        |                          System: ask username and password                          |
+|       3        |                         User: provide username and password                         |
+|       4        |                     System: read provided username and password                     |
+|       5        | System: check if provided username has not already been used in another account yet |
+|       6        |           System: username has already been used, user is not registered            |
+|       7        |                            System: Provide error message                            |
+
+### Use case 3, UC3: Logout
+
+| Actors Involved  |      User       |
+| :--------------: | :-------------: |
+|   Precondition   | User logged in  |
+|  Post condition  | User logged out |
+| Nominal Scenario |  Scenario 3.1   |
+|     Variants     |      None       |
+|    Exceptions    |  Scenario 3.2   |
+
+##### Scenario 3.1
+
+|  Scenario 3.1  |                 Logout                  |
+| :------------: | :-------------------------------------: |
+|  Precondition  |             User logged in              |
+| Post condition |             User logged out             |
+|     Step#      |               Description               |
+|       1        |           User: ask to logout           |
+|       2        |            System: find user            |
+|       4        | System: redirect user to the login page |
+
+##### Scenario 3.2
+
+|  Scenario 3.2  |           User already logged out           |
+| :------------: | :-----------------------------------------: |
+|  Precondition  |               User logged out               |
+| Post condition |               User logged out               |
+|     Step#      |                 Description                 |
+|       1        |             User: ask to logout             |
+|       2        |              System: find user              |
+|       4        | System: User not logged, show error message |
+
+### Use case 4, UC4: Cart management
+
+| Actors Involved  |                                Customer                                 |
+| :--------------: | :---------------------------------------------------------------------: |
+|   Precondition   |                           Customer logged in                            |
+|  Post condition  | Product added/removed to cart, Cart checkout, Cart History, Delete Cart |
+| Nominal Scenario |                    Scenario 4.1, 4.2, 4.3, 4.4, 4.5                     |
+|     Variants     |                                  None                                   |
+|    Exceptions    |                                  None                                   |
+
+##### Scenario 4.1
+
+|  Scenario 4.1  |             Add product to cart              |
+| :------------: | :------------------------------------------: |
+|  Precondition  |              Customer logged in              |
+| Post condition |            Product added to cart             |
+|     Step#      |                 Description                  |
+|       1        |        Customer: search for a product        |
+|       2        | Customer: ask to add the product to the cart |
+|       3        | System: add the product to the Customer cart |
+
+##### Scenario 4.2
+
+|  Scenario 4.2  |                       Remove product from cart                        |
+| :------------: | :-------------------------------------------------------------------: |
+|  Precondition  |                          Customer logged in                           |
+| Post condition |                     Product removed from the cart                     |
+|     Step#      |                              Description                              |
+|       1        |                 Customer: ask to view cart's products                 |
+|       2        |            System: retrieve cart's products and show them             |
+|       3        |            Customer: ask to remove a product from the cart            |
+|       4        | System: remove the selected product from the customer cart and update |
+
+##### Scenario 4.3
+
+|  Scenario 4.3  |                                         Cart checkout                                          |
+| :------------: | :--------------------------------------------------------------------------------------------: |
+|  Precondition  |                                       Customer logged in                                       |
+| Post condition |                               Purchased all products in the cart                               |
+|     Step#      |                                          Description                                           |
+|       1        |                                    Customer: open the cart                                     |
+|       2        |                               Customer: ask to purchase the cart                               |
+|       3        |        System: ask to insert order information (shipping address, payment type, etc...)        |
+|       4        |              System: wait for the end of the chosen payment provider transaction               |
+|       5        |                       System: print a message of successful transaction                        |
+|       5        | System: save the cart content in cart-history, flag it as purchased and empty the current cart |
+
+##### Scenario 4.4
+
+|  Scenario 4.4  |                                           Show history of past purchased carts                                           |
+| :------------: | :----------------------------------------------------------------------------------------------------------------------: |
+|  Precondition  |                                                    Customer logged in                                                    |
+| Post condition |                                                  Cart history displayed                                                  |
+|     Step#      |                                                       Description                                                        |
+|       1        |                                                 Customer: open the cart                                                  |
+|       2        |                                      Customer: asks to display past purchased carts                                      |
+|       3        | System: retrieves all cart associated to the user, except the current one. Sort them in decending order of purchase date |
+|       4        |                                               System: display cart history                                               |
+
+##### Scenario 4.5
+
+|  Scenario 4.5  |                        Delete Cart                        |
+| :------------: | :-------------------------------------------------------: |
+|  Precondition  |                    Customer logged in                     |
+| Post condition |                      Cart is deleted                      |
+|     Step#      |                        Description                        |
+|       1        |           Customer: asks to delete current cart           |
+|       2        | System: retrieves the current cart associeted to the user |
+|       3        |                  System: delete the cart                  |
+
+### Use case 5, UC5: Catalogue management
+
+| Actors Involved  |                                        Manager                                         |
+| :--------------: | :------------------------------------------------------------------------------------: |
+|   Precondition   |                                   Manager logged in                                    |
+|  Post condition  | Product added/removed to catalogue, new (set of) product(s) added, product marked sold |
+| Nominal Scenario |                              Scenario 5.1, 5.2, 5.3, 5.4                               |
+|     Variants     |                                          None                                          |
+|    Exceptions    |                                          None                                          |
+
+##### Scenario 5.1
+
+|  Scenario 5.1  |             Add product to catalogue             |
+| :------------: | :----------------------------------------------: |
+|  Precondition  |                Manager logged in                 |
+| Post condition |            Product added to catalogue            |
+|     Step#      |                   Description                    |
+|       1        |       Manager: ask to insert a new product       |
+|       2        |             System: ask product data             |
+|       3        | Manager: ask to add the product to the catalogue |
+|       4        |     System: add the product to the catalogue     |
+
+##### Scenario 5.2
+
+|  Scenario 5.2  |             Remove product from catalogue             |
+| :------------: | :---------------------------------------------------: |
+|  Precondition  |                   Manager logged in                   |
+| Post condition |           Product removed to the catalogue            |
+|     Step#      |                      Description                      |
+|       1        |              Manager: open the catalogue              |
+|       2        |  Manager: ask to remove a product from the catalogue  |
+|       3        | System: remove the product from the Manager catalogue |
+
+##### Scenario 5.3
+
+|  Scenario 5.3  |               Add new sets of product to catalogue                |
+| :------------: | :---------------------------------------------------------------: |
+|  Precondition  |                         Manager logged in                         |
+| Post condition |               New set of product added to catalogue               |
+|     Step#      |                            Description                            |
+|       1        |   Manager: ask to insert a new set of product to the catalogue    |
+|       2        |                  System: ask set of product data                  |
+|       3        |                      Manager: provides data                       |
+|       4        | System: read the data and add the set of product to the catalogue |
+
+##### Scenario 5.4
+
+|  Scenario 5.4  |                             Mark product as sold                              |
+| :------------: | :---------------------------------------------------------------------------: |
+|  Precondition  |                               Manager logged in                               |
+| Post condition |                            Product marked as sold                             |
+|     Step#      |                                  Description                                  |
+|       1        |           Manager: ask to mark a product as sold into the catalogue           |
+|       2        |                           System: ask product data                            |
+|       3        |                        Manager: provides product data                         |
+|       3        | System: read the data provided and add the product as marked to the catalogue |
+
+### Use case 6, UC6: Products search
+
+| Actors Involved  |                                             Users (Customers and Managers)                                              |
+| :--------------: | :---------------------------------------------------------------------------------------------------------------------: |
+|   Precondition   |                                                     User logged in                                                      |
+|  Post condition  | Products list displayed, Returns all products of a specific category/of a specific model, Returns a product by its code |
+| Nominal Scenario |                                                 Scenario 6.1, 6.2, 6.3                                                  |
+|     Variants     |                                                          None                                                           |
+|    Exceptions    |                                                          None                                                           |
+
+##### Scenario 6.1
+
+|  Scenario 6.1  |                  Show products list                  |
+| :------------: | :--------------------------------------------------: |
+|  Precondition  |                    User logged in                    |
+| Post condition |               Products list displayed                |
+|     Step#      |                     Description                      |
+|       1        |          User: ask to search for a product.          |
+|       2        | System: find all products belonging to the catalogue |
+|       3        |          System: display the products list           |
+
+##### Scenario 6.2
+
+|  Scenario 6.2  |                   Show products list given a category/model                   |
+| :------------: | :---------------------------------------------------------------------------: |
+|  Precondition  |                                User logged in                                 |
+| Post condition |                            Products list displayed                            |
+|     Step#      |                                  Description                                  |
+|       1        |        User: ask to search for a product specifying category or model         |
+|       2        | System: find all products belonging to the catalogue that matches user search |
+|       3        |                       System: display the products list                       |
+
+##### Scenario 6.3
+
+|  Scenario 6.3  |                         Show product given its code                          |
+| :------------: | :--------------------------------------------------------------------------: |
+|  Precondition  |                                User logged in                                |
+| Post condition |                              Product displayed                               |
+|     Step#      |                                 Description                                  |
+|       1        |                 User: search for a product specifying its ID                 |
+|       2        | System: find the product belonging to the catalogue that matches user search |
+|       3        |                      System: display the products list                       |
 
 # Glossary
 
-\<use UML class diagram to define important terms, or concepts in the domain of the application, and their relationships>
-
-\<concepts must be used consistently all over the document, ex in use cases, requirements etc>
+![Alt text](./images/ClassDiagramV1.png)
 
 # System Design
 
-\<describe here system design>
-
-\<must be consistent with Context diagram>
+![Alt text](./images/SystemDesignV1.png)
 
 # Deployment Diagram
 
-\<describe here deployment diagram >
+![Alt text](./images/DeploymentDiagramV1.png)
