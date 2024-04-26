@@ -20,3 +20,14 @@ This file just contains what has been changed in requirement V1
 |FR3.6  |       Cancellazione di tutti i carrelli                                                 |
 
 /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+
+
+
+
+/// 2024-04-26 edit /// /// /// /// /// /// /// /// /// /// /// /// ///
+/// Edits to EstimationV1.md, just reporting some notes and assumptions
+
+-   Number of classes: I have counted the classes inside the class diagram (4) + classes needed for FR 1,2,3 (3)
+    => NC = 4 + 3 = 7 classes (User, Product, Catalogue, Cart, AuthHandler, CatalogueHandler, CartHandler)
+-   Estimated average lines of code for each class: User=150, Product=150, Catalogue=150, Cart=150, AuthHandler=500, CatalogueHandler=500, CartHandler=500
+    => avg(LOC) = (150*4 + 500*3) / 7 = 300
