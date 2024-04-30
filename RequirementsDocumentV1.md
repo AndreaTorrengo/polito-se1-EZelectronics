@@ -26,9 +26,33 @@ Version: V1 - description of EZElectronics in CURRENT form (as received by teach
     - [Use case 1, UC1](#use-case-1-uc1)
       - [Scenario 1.1](#scenario-11)
       - [Scenario 1.2](#scenario-12)
-      - [Scenario 1.x](#scenario-1x)
+      - [Scenario 1.3](#scenario-13)
+      - [Scenario 1.4](#scenario-14)
     - [Use case 2, UC2](#use-case-2-uc2)
-    - [Use case x, UCx](#use-case-x-ucx)
+      - [Scenario 2.1](#scenario-21)
+      - [Scenario 2.2](#scenario-22)
+      - [Scenario 2.3](#scenario-23)
+      - [Scenario 2.4](#scenario-24)
+      - [Scenario 2.5](#scenario-25)
+      - [Scenario 2.6](#scenario-26)
+    - [Use case 3, UC3](#use-case-3-uc3)
+      - [Scenario 3.1](#scenario-31)
+      - [Scenario 3.2](#scenario-32)
+    - [Use case 4, UC4](#use-case-4-uc4)
+      - [Scenario 4.1](#scenario-41)
+      - [Scenario 4.2](#scenario-42)
+      - [Scenario 4.3](#scenario-43)
+      - [Scenario 4.4](#scenario-44)
+      - [Scenario 4.5](#scenario-45)
+    - [Use case 5, UC5](#use-case-5-uc5)
+      - [Scenario 5.1](#scenario-51)
+      - [Scenario 5.2](#scenario-52)
+      - [Scenario 5.3](#scenario-53)
+      - [Scenario 5.4](#scenario-54)
+    - [Use case 6, UC6](#use-case-6-uc6)
+      - [Scenario 6.1](#scenario-61)
+      - [Scenario 6.2](#scenario-62)
+      - [Scenario 6.3](#scenario-63)
 - [Glossary](#glossary)
 - [System Design](#system-design)
 - [Deployment Diagram](#deployment-diagram)
@@ -39,11 +63,11 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 
 # Stakeholders
 
-| Stakeholder name |             Description             |
-| :--------------: | :---------------------------------: |
-|     Manager      |        EZElectronics Manager        |
-|     Customer     |       EZElectronics Customer        |
-|    SW factory    | Developers of EZelectronics website |
+| Stakeholder name |                Description                |
+| :--------------: | :---------------------------------------: |
+|     Manager      | User who can modify the product catalogue |
+|     Customer     | User who can buy from EZElectronics store |
+|    SW factory    |    Developer of EZElectronics website     |
 
 # Context Diagram and interfaces
 
@@ -68,35 +92,35 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 
 ## Functional Requirements
 
-|  ID   |                           Description                           |
-| :---: | :-------------------------------------------------------------: |
-|  FR1  |               Users management and authentication               |
-| FR1.1 |                              Login                              |
-| FR1.2 |                             Logout                              |
-| FR1.3 |                             Signup                              |
-| FR1.4 |  Account management (creation, edit, delete, role definition)   |
-|  FR2  |                       Product management                        |
-| FR2.1 |                   Add/remove a single product                   |
-| FR2.2 |       Registers the arrival of a new (set of) product(s)        |
-| FR2.3 |                     Marks a product as sold                     |
-| FR2.4 |                      Returns all products.                      |
-| FR2.5 | Returns all products of a specific category/of a specific model |
-| FR2.6 |                  Returns a product by its code                  |
-|  FR3  |                         Cart management                         |
-| FR3.1 |            Add/remove product given its ID from cart            |
-| FR3.2 |                   Checks out the user's cart                    |
-| FR3.3 |        View purchased carts history for a specific user         |
-| FR3.4 |               Delete a specific cart given its ID               |
-| FR3.5 |                       View cart products                        |
+|  ID   |                         Description                         |
+| :---: | :---------------------------------------------------------: |
+|  FR1  |             Users management and authentication             |
+| FR1.1 |                            Login                            |
+| FR1.2 |                           Logout                            |
+| FR1.3 |                           Signup                            |
+| FR1.4 |         Account management (creation, edit, delete)         |
+|  FR2  |                     Product management                      |
+| FR2.1 |                 Add/remove a single product                 |
+| FR2.2 |     Registers the arrival of a new (set of) product(s)      |
+| FR2.3 |                   Marks a product as sold                   |
+| FR2.4 |                      Get all products.                      |
+| FR2.5 | Get all products of a specific category/of a specific model |
+| FR2.6 |                  Get a product by its code                  |
+|  FR3  |                       Cart management                       |
+| FR3.1 |          Add/remove product given its ID from cart          |
+| FR3.2 |                 Checks out the user's cart                  |
+| FR3.3 |      View purchased carts history for a specific user       |
+| FR3.4 |             Delete a specific cart given its ID             |
+| FR3.5 |                     View cart products                      |
 
 ## Non Functional Requirements
 
-|  ID  | Type (efficiency, reliability, ..) |                                                 Description                                                  | Refers to |
-| :--: | :--------------------------------: | :----------------------------------------------------------------------------------------------------------: | :-------: |
-| NFR1 |             Usability              |                                         Users must not need training                                         |  All FR   |
-| NFR2 |             Efficiency             |                                All app features must be completed under 0.1s                                 |  All FR   |
-| NFR3 |            Reliability             |                               Users must not report more than one bug per year                               |  All FR   |
-| NFR4 |            Portability             | Mobile app must be compatible for the following browsers: Chrome v64.0.3282, Firefox v57.0.4, Safari v12.0.1 |  All FR   |
+|  ID  | Type (efficiency, reliability, ..) |                                                Description                                                | Refers to |
+| :--: | :--------------------------------: | :-------------------------------------------------------------------------------------------------------: | :-------: |
+| NFR1 |             Usability              |                                       Users must not need training                                        |  All FR   |
+| NFR2 |             Efficiency             |                               All app features must be completed under 0.1s                               |  All FR   |
+| NFR3 |            Reliability             |                             Users must not report more than one bug per year                              |  All FR   |
+| NFR4 |            Portability             | Web app must be compatible for the following browsers: Chrome v64.0.3282, Firefox v57.0.4, Safari v12.0.1 |  All FR   |
 
 # Table of rights
 
@@ -138,11 +162,6 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 |    Exceptions    |         Scenario 1.2, 1.3, 1.4         |
 
 ##### Scenario 1.1
-
-\<describe here scenarios instances of UC1>
-\<a scenario is a sequence of steps that corresponds to a particular execution of one use case>
-\<a scenario is a more formal description of a story>
-\<only relevant scenarios should be described>
 
 |  Scenario 1.1  |                                            Login                                             |
 | :------------: | :------------------------------------------------------------------------------------------: |
