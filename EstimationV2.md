@@ -15,7 +15,11 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 |                                                                                                         | Estimate  |
 | ------------------------------------------------------------------------------------------------------- | --------- |
 | NC = Estimated number of classes to be developed                                                        | 15        |
+| B = Estimated size of frontend, in LOC                                                                  | 3000 LOC  |
 | A = Estimated average size per class, in LOC                                                            | 380 LOC   |
+| D = Estimated size of requirement document, in LOC                                                      | 831 LOC   |
+| F = Estimated size of API document, in LOC                                                              | 387 LOC   |
+| G = Estimated size of tests, in LOC                                                                     | 1200 LOC  |
 | S = Estimated size of project, in LOC (= NC \* A)                                                       | 5700 LOC  |
 | E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)                    | 570 PH    |
 | C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                                     | 17100 €   |

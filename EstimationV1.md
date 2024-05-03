@@ -16,10 +16,14 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 | ------------------------------------------------------------------------------------------------------ | --------- |
 | NC = Estimated number of classes to be developed                                                       | 7         |
 | A = Estimated average size per class, in LOC                                                           | 300 LOC   |
-| S = Estimated size of project, in LOC (= NC \* A)                                                      | 2100 LOC  |
-| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)                   | 210 PH    |
-| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                                    | 6300 €    |
-| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week) | 1.3 weeks |
+| B = Estimated size of frontend, in LOC                                                                 | 1800 LOC  |
+| D = Estimated size of requirement document, in LOC                                                     | 466 LOC   |
+| F = Estimated size of API document, in LOC                                                             | 387 LOC   |
+| G = Estimated size of tests, in LOC                                                                    | 700 LOC   |
+| S = Estimated size of project, in LOC (= NC \* A)                                                      | 3653 LOC  |
+| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)                   | 365 PH    |
+| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                                    | 10.950 €  |
+| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week) | 2.3 weeks |
 
 # Estimate by product decomposition
 
@@ -66,6 +70,6 @@ How we computed estimated duration: we have divided the effort in person-hours b
 
 |                                    | Estimated effort | Estimated duration |
 | ---------------------------------- | ---------------- | ------------------ |
-| estimate by size                   | 210 PH           | 52.5 h (~2d)       |
+| estimate by size                   | 365 PH           | 52.5 h (~2d)       |
 | estimate by product decomposition  | 285 PH           | 71.3 h (2d + 6h)   |
 | estimate by activity decomposition | 400 PH           | 100 h (4d + 4h)    |
