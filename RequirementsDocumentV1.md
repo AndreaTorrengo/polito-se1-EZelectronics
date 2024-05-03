@@ -171,7 +171,7 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 |       1        |                              System: ask username and password                               |
 |       2        |                         User: provide correct username and password                          |
 |       3        |                         System: read provided username and password                          |
-|       4        | System: retrieve username and password stored on database and compare with the ones provided |
+|       4        |                          System:check if username and password provided exist                |
 |       5        |                  System: username and password match, user is authenticated                  |
 
 ##### Scenario 1.2
@@ -184,7 +184,7 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 |       1        |                              System: ask username and password                               |
 |       2        |                              User: provide username or password                              |
 |       3        |                         System: read provided username and password                          |
-|       4        | System: retrieve username and password stored on database and compare with the ones provided |
+|       4        |        System: check if username and password provided exist                                 |
 |       5        |            System: username and password do not match, user is not authenticated             |
 
 ##### Scenario 1.3
@@ -197,7 +197,7 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 |       1        |                              System: ask username and password                               |
 |       2        |                             User: provide username and password                              |
 |       3        |                         System: read provided username and password                          |
-|       4        | System: retrieve username and password stored on database and compare with the ones provided |
+|       4        |                         System: check if username and password provided exist                |
 |       5        |                   System: username is not found, user is not authenticated                   |
 
 ##### Scenario 1.4
