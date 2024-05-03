@@ -42,18 +42,17 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 | Activity name                               | Estimated effort (person hours) |
 | ------------------------------------------- | ------------------------------- |
 | Review existing code                        | 8                               |
-| Defining requirements                       | 8                               |
-| Model GUI                                   | 8                               |
-| Estimation                                  | 6                               |
-| Design                                      | 8                               |
+| Defining requirements                       | 30                              |
+| Model GUI                                   | 10                              |
+| Estimation                                  | 12                              |
+| Design                                      | 20                              |
 | Test data                                   | 8                               |
-| Prepare software requirements specification |                                 |
-| Software requirements review                |                                 |
+| Prepare software requirements specification | 16                              |
+| Software requirements review                | 8                               |
 | API documentation                           | 8                               |
-| Coding                                      | 8                               |
-| Test plan                                   | 8                               |
-| Unit test                                   | 8                               |
-| System test                                 | 8                               |
+| Coding                                      | 180                             |
+| Test plan                                   | 20                              |
+| Software testing                            | 80                              |
 
 ###
 
@@ -61,10 +60,12 @@ Insert here Gantt chart with above activities
 
 # Summary
 
-Report here the results of the three estimation approaches. The estimates may differ. Discuss here the possible reasons for the difference
+Report here the results of the three estimation approaches. The estimates may differ. Discuss here the possible reasons for the difference.
+
+How we computed estimated duration: we have divided the effort in person-hours by the number of team members (4)
 
 |                                    | Estimated effort | Estimated duration |
 | ---------------------------------- | ---------------- | ------------------ |
-| estimate by size                   | 210 PH           |
-| estimate by product decomposition  | 285 PH           |
-| estimate by activity decomposition |                  |
+| estimate by size                   | 210 PH           | 52.5 h (~2d)       |
+| estimate by product decomposition  | 285 PH           | 71.3 h (2d + 6h)   |
+| estimate by activity decomposition | 400 PH           | 100 h (4d + 4h)    |
