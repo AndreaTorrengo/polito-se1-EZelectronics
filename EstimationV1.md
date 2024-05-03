@@ -10,6 +10,9 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 
 # Estimate by size
 
+### Details
+
+
 ###
 
 |                                                                                                        | Estimate  |
