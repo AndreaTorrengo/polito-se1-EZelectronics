@@ -33,7 +33,7 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 | code                 | 480                             |
 | unit tests           | 80                              |
 | api tests            | 50                              |
-| management documents | 25                              |
+| management documents | 26                              |
 
 # Estimate by activity decomposition
 
@@ -42,17 +42,17 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 | Activity name                               | Estimated effort (person hours) |
 | ------------------------------------------- | ------------------------------- |
 | Review existing code                        | 8                               |
-| Defining requirements                       | 70                              |
+| Defining requirements                       | 60                              |
 | Model GUI                                   | 20                              |
 | Estimation                                  | 16                              |
 | Design                                      | 48                              |
 | Test data                                   | 14                              |
 | Prepare software requirements specification | 40                              |
 | Software requirements review                | 20                              |
-| API documentation                           | 25                              |
+| API documentation                           | 24                              |
 | Coding                                      | 480                             |
-| Test plan                                   | 46                              |
-| Software testing                            | 200                             |
+| Test plan                                   | 40                              |
+| Software testing                            | 240                             |
 
 ###
 
@@ -62,8 +62,8 @@ Insert here Gantt chart with above activities
 
 Report here the results of the three estimation approaches. The estimates may differ. Discuss here the possible reasons for the difference
 
-|                                    | Estimated effort | Estimated duration |
-| ---------------------------------- | ---------------- | ------------------ |
-| estimate by size                   |                  |
-| estimate by product decomposition  |                  |
-| estimate by activity decomposition |                  |
+|                                    | Estimated effort | Estimated duration  |
+| ---------------------------------- | ---------------- | ------------------- |
+| estimate by product decomposition  | 740 PH           | 185 h               |
+| estimate by size                   | 570 PH           | 142.5 h (~6d)       |
+| estimate by activity decomposition | 910 PH           | 227.5 h (~9d + 12h) |
