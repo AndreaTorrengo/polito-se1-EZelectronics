@@ -62,7 +62,7 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 
 ###
 
-Insert here Gantt chart with above activities
+![Alt text](./images/ActivitiesGanttV2.png)
 
 # Summary
 
