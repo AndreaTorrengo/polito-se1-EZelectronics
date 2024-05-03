@@ -57,6 +57,8 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 ###
 
 Insert here Gantt chart with above activities
+![Alt text](./images/ActivitiesGanttV1.png)
+
 
 # Summary
 
