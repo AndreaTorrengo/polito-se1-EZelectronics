@@ -30,6 +30,7 @@ Version: V1 - description of EZElectronics in FUTURE form (as proposed by the te
     - [Use case 2, UC2](#use-case-2-uc3)
       - [Scenario 2.1](#scenario-21)
       - [Scenario 2.2](#scenario-22)
+      - [Scenario 2.3](#scenario-23)
     - [Use case 3, UC3](#use-case-3-uc3)
       - [Scenario 3.1](#scenario-31)
       - [Scenario 3.2](#scenario-32)
@@ -38,7 +39,7 @@ Version: V1 - description of EZElectronics in FUTURE form (as proposed by the te
       - [Scenario 4.2](#scenario-42)
       - [Scenario 4.3](#scenario-43)
       - [Scenario 4.4](#scenario-44)
-      - [Scenario 4.4](#scenario-45)
+      - [Scenario 4.5](#scenario-45)
     - [Use case 5, UC5](#use-case-5-uc5)
       - [Scenario 5.1](#scenario-51)
       - [Scenario 5.2](#scenario-52)
@@ -183,6 +184,7 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 |    F4.3     |          |         |   x   |
 |    F4.4     |          |         |   x   |
 |    F4.5     |          |         |   x   |
+|    F4.6     |          |         |   x   |
 |     F5      |    x     |         |       |
 |    F5.1     |    x     |         |       |
 |    F5.2     |    x     |         |       |
@@ -282,21 +284,35 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 
 ##### Scenario 2.1
 
-|  Scenario 2.1  |                                               Registration                                               |
+|  Scenario 2.1  |                                          Customer registration                                           |
 | :------------: | :------------------------------------------------------------------------------------------------------: |
-|  Precondition  |                                          User is not registered                                          |
-| Post condition |                                             User registered                                              |
+|  Precondition  |                                        Customer is not registered                                        |
+| Post condition |                                           Customer registered                                            |
 |     Step#      |                                               Description                                                |
 |       1        |                                    User: ask to register as customer                                     |
-|       2        |                                    System: ask username and password                                     |
-|       3        |                                   User: provide username and password                                    |
-|       4        |                               System: read provided username and password                                |
+|       2        |                             System: ask name, surname, username and password                             |
+|       3        |                            User: provide name, surname, username and password                            |
+|       4        |                        System: read provided name, surname, username and password                        |
 |       5        |           System: check if provided username has not already been used in another account yet            |
 |       6        | System: username has not been used yet, user is registered and authenticated, his information are stored |
 
 ##### Scenario 2.2
 
-|  Scenario 2.2  |                             Username already registered                             |
+|  Scenario 2.2  |                                      Manager application                                      |
+| :------------: | :-------------------------------------------------------------------------------------------: |
+|  Precondition  |                                 Manager application is absent                                 |
+| Post condition |                                   Manager application sent                                    |
+|     Step#      |                                          Description                                          |
+|       1        |                                 User: apply for manager role                                  |
+|       2        |                   System: ask name, surname, username, password and details                   |
+|       3        |                  User: provide name, surname, username, password and details                  |
+|       4        |              System: read provided name, surname, username, password and details              |
+|       5        |      System: check if provided username has not already been used in another account yet      |
+|       6        | System: username has not been used yet, application sent to admin, his information are stored |
+
+##### Scenario 2.3
+
+|  Scenario 2.3  |                             Username already registered                             |
 | :------------: | :---------------------------------------------------------------------------------: |
 |  Precondition  |                                   User registered                                   |
 | Post condition |                                 Registration failed                                 |
@@ -765,15 +781,15 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 
 ##### Scenario 10.5
 
-| Scenario 10.5  |                        Add user with manager role                         |
-| :------------: | :-----------------------------------------------------------------------: |
-|  Precondition  |                              Admin logged in                              |
-| Post condition |                     User with manager role is created                     |
-|     Step#      |                                Description                                |
-|       1        |                         Admin: ask to add manager                         |
-|       2        |             System: ask username, name, surname and password              |
-|       3        |            Admin: insert username, name, surname and password             |
-|       4        | System: check if username exists, if doesn't exist it creates the manager |
+| Scenario 10.5  |                      Add user with manager role                      |
+| :------------: | :------------------------------------------------------------------: |
+|  Precondition  |                           Admin logged in                            |
+| Post condition |                  Manager request accepted or denied                  |
+|     Step#      |                             Description                              |
+|       1        |            Admin: ask to get all pending manager requests            |
+|       2        |            System: retrieves all pending manager requests            |
+|       3        | Admin: select a request and choose whether accept or not the request |
+|       4        |           System: save request status (accepted or denied)           |
 
 ##### Scenario 10.6
 
