@@ -34,7 +34,8 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 | requirement document | 60                              |
 | GUI prototype        | 20                              |
 | design document      | 24                              |
-| code                 | 480                             |
+| code: frontend       | 400                             |
+| code: backend        | 570                             |
 | unit tests           | 80                              |
 | api tests            | 50                              |
 | management documents | 26                              |
@@ -46,17 +47,18 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 | Activity name                               | Estimated effort (person hours) |
 | ------------------------------------------- | ------------------------------- |
 | Review existing code                        | 8                               |
-| Defining requirements                       | 60                              |
+| Defining requirements                       | 40                              |
 | Model GUI                                   | 20                              |
 | Estimation                                  | 16                              |
-| Design                                      | 48                              |
+| Design                                      | 24                              |
 | Test data                                   | 14                              |
 | Prepare software requirements specification | 40                              |
 | Software requirements review                | 20                              |
 | API documentation                           | 24                              |
-| Coding                                      | 480                             |
-| Test plan                                   | 40                              |
-| Software testing                            | 240                             |
+| Coding: frontend                            | 400                             |
+| Coding: backend                             | 570                             |
+| Test plan                                   | 15                              |
+| Software testing                            | 120                             |
 
 ###
 
@@ -66,8 +68,8 @@ Insert here Gantt chart with above activities
 
 Report here the results of the three estimation approaches. The estimates may differ. Discuss here the possible reasons for the difference
 
-|                                    | Estimated effort | Estimated duration  |
-| ---------------------------------- | ---------------- | ------------------- |
-| estimate by size                   | 1211.8 PH        | 303 h (~12d)        |
-| estimate by product decomposition  | 740 PH           | 185 h               |
-| estimate by activity decomposition | 910 PH           | 227.5 h (~9d + 12h) |
+|                                    | Estimated effort | Estimated duration |
+| ---------------------------------- | ---------------- | ------------------ |
+| estimate by size                   | 1211.8 PH        | 303 h              |
+| estimate by product decomposition  | 1230 PH          | 307.5 h            |
+| estimate by activity decomposition | 1311 PH          | 327.8 h            |

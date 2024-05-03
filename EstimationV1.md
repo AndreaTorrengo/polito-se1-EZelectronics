@@ -22,7 +22,7 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 | G = Estimated size of tests, in LOC                                                                    | 700 LOC   |
 | S = Estimated size of project, in LOC (= NC \* A)                                                      | 5453 LOC  |
 | E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)                   | 545 PH    |
-| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                                    | 16350 €  |
+| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                                    | 16350 €   |
 | Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week) | 3.4 weeks |
 
 # Estimate by product decomposition
@@ -34,7 +34,8 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 | requirement document | 25                              |
 | GUI prototype        | 10                              |
 | design document      | 10                              |
-| code                 | 180                             |
+| code: frontend       | 180                             |
+| code: backend        | 210                             |
 | unit tests           | 30                              |
 | api tests            | 20                              |
 | management documents | 10                              |
@@ -46,17 +47,18 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 | Activity name                               | Estimated effort (person hours) |
 | ------------------------------------------- | ------------------------------- |
 | Review existing code                        | 8                               |
-| Defining requirements                       | 30                              |
+| Defining requirements                       | 20                              |
 | Model GUI                                   | 10                              |
 | Estimation                                  | 12                              |
-| Design                                      | 20                              |
+| Design                                      | 10                              |
 | Test data                                   | 8                               |
 | Prepare software requirements specification | 16                              |
 | Software requirements review                | 8                               |
 | API documentation                           | 8                               |
-| Coding                                      | 180                             |
-| Test plan                                   | 20                              |
-| Software testing                            | 80                              |
+| Coding: frontend                            | 180                             |
+| Coding: backend                             | 210                             |
+| Test plan                                   | 6                               |
+| Software testing                            | 40                              |
 
 ###
 
@@ -70,6 +72,6 @@ How we computed estimated duration: we have divided the effort in person-hours b
 
 |                                    | Estimated effort | Estimated duration |
 | ---------------------------------- | ---------------- | ------------------ |
-| estimate by size                   | 545 PH           | 136.2 h (~5d)      |
-| estimate by product decomposition  | 285 PH           | 71.3 h (2d + 6h)   |
-| estimate by activity decomposition | 400 PH           | 100 h (4d + 4h)    |
+| estimate by size                   | 545 PH           | 136.2 h            |
+| estimate by product decomposition  | 494 PH           | 123.8 h            |
+| estimate by activity decomposition | 590 PH           | 147.5 h            |
