@@ -10,7 +10,26 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 
 # Estimate by size
 
-###
+### Details
+To compute NC and AVG LOC per class, we have considered the following classes:
+1) Manager (300 LOC)
+2) Customer (300 LOC)
+3) Admin (300 LOC)
+4) User (300 LOC)
+5) Catalogue (300 LOC)
+6) Cart (300 LOC)
+7) Product (300 LOC)
+8) Order (300 LOC)
+9) Feedback (300 LOC)
+10) CartHandler (500 LOC)
+11) CatalogueHandler (500 LOC)
+12) ProductHandler (500 LOC)
+13) AuthenticatorHandler (500 LOC)
+14) OrderHandler (500 LOC)
+15) FeedbackHandler (500 LOC)
+
+> Average size per class = $\frac{300*9 + 500*6}{15}=380$ LOC
+
 
 |                                                                                                         | Estimate  |
 | ------------------------------------------------------------------------------------------------------- | --------- |
@@ -20,7 +39,7 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 | D = Estimated size of requirement document, in LOC                                                      | 831 LOC   |
 | F = Estimated size of API document, in LOC                                                              | 387 LOC   |
 | G = Estimated size of tests, in LOC                                                                     | 1200 LOC  |
-| S = Estimated size of project, in LOC (= NC \* A)                                                       | 12118 LOC |
+| S = Estimated size of project, in LOC (= $ NC*A+B+D+F+G $)                                                       | 12118 LOC |
 | E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)                    | 1211.8 PH |
 | C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                                     | 36354 €   |
 | Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | 7.6 weeks |
@@ -67,6 +86,8 @@ Consider the EZElectronics project in FUTURE version (as proposed by your team i
 # Summary
 
 Report here the results of the three estimation approaches. The estimates may differ. Discuss here the possible reasons for the difference
+
+How we computed estimated duration: we have divided the effort in person-hours by the number of team members (4)
 
 |                                    | Estimated effort | Estimated duration |
 | ---------------------------------- | ---------------- | ------------------ |

@@ -11,7 +11,16 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 # Estimate by size
 
 ### Details
+To compute NC and AVG LOC per class, we have considered the following classes:
+1) User (150 LOC)
+2) Catalogue (150 LOC)
+3) Cart (150 LOC)
+4) Product (150 LOC)
+5) CartHandler (500 LOC)
+6) CatalogueHandler (500 LOC)
+7) AuthenticatorHandler (500 LOC)
 
+> Average size per class = $\frac{150*4 + 500*3}{7}=300$ LOC
 
 ###
 
@@ -23,7 +32,7 @@ Consider the EZElectronics project in CURRENT version (as given by the teachers)
 | D = Estimated size of requirement document, in LOC                                                     | 466 LOC   |
 | F = Estimated size of API document, in LOC                                                             | 387 LOC   |
 | G = Estimated size of tests, in LOC                                                                    | 700 LOC   |
-| S = Estimated size of project, in LOC (= NC \* A)                                                      | 5453 LOC  |
+| S = Estimated size of project, in LOC (= $ NC*A+B+D+F+G $)                                                      | 5453 LOC  |
 | E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)                   | 545 PH    |
 | C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                                    | 16350 €   |
 | Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week) | 3.4 weeks |
