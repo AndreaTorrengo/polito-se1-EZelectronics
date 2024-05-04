@@ -28,7 +28,7 @@ To compute NC and AVG LOC per class, we have considered the following classes:
 14) OrderHandler (500 LOC)
 15) FeedbackHandler (500 LOC)
 
-> Average size per class = $\frac{300*9 + 500*6}{15}=380$ LOC
+> Average size per class = (300\*9 + 500\*6) / 15 = 380 LOC
 
 
 |                                                                                                         | Estimate  |
@@ -39,7 +39,7 @@ To compute NC and AVG LOC per class, we have considered the following classes:
 | D = Estimated size of requirement document, in LOC                                                      | 831 LOC   |
 | F = Estimated size of API document, in LOC                                                              | 387 LOC   |
 | G = Estimated size of tests, in LOC                                                                     | 1200 LOC  |
-| S = Estimated size of project, in LOC (= $ NC*A+B+D+F+G $)                                                       | 12118 LOC |
+| S = Estimated size of project, in LOC (= NC\*A+B+D+F+G)                                                       | 12118 LOC |
 | E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)                    | 1211.8 PH |
 | C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                                     | 36354 €   |
 | Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | 7.6 weeks |
