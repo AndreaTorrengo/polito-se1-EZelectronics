@@ -111,9 +111,12 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 
 # Stories and personas
 
-\<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
-\<Persona is-an-instance-of actor>
-\<stories will be formalized later as scenarios in use cases>
+1. Luigi, 45 years old, is the manager of EZelectronics store, and wants to expand his business, so he decides to sell his products online
+2. Pina, 32 years old, is really busy with work and to spare time, decides that she is going to buy products she needs online
+3. Michele, 22 years old, is a university student with many passions and projects, decides to try buying online for a wide choice of products at affordable prices
+4. Leo, 27 years old, is a lawyer. He decides he wants to buy a new smartphone for his girlfriend using a software application. Leo opens the applications, selects the product he wants to buy, and puts it in his cart.
+5. Peppe, 55 years old, is the administrator of the software application. Peppe decides who can be a manager seeing the job application and uses his supervisory privileges to remove offensive feedback
+6. Gianfranco, 48 years old, receives a new set of product and decides to register some products with discounts
 
 # Functional and non functional requirements
 
@@ -823,9 +826,8 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 
 # System Design
 
-\<describe here system design>
-\<must be consistent with Context diagram>
+![Alt text](./images/SystemDesignV1.png)
 
 # Deployment Diagram
 
-\<describe here deployment diagram>
+![Alt text](./images/DeploymentDiagramV1.png)
