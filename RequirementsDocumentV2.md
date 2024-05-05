@@ -4,9 +4,14 @@ Date:
 
 Version: V1 - description of EZElectronics in FUTURE form (as proposed by the team)
 
-| Version number | Change |
-| :------------: | :----: |
-|       1        |        |
+| Version number |                                Change                                |
+| :------------: | :------------------------------------------------------------------: |
+|      1.0       |                            initial commit                            |
+|      1.1       |      added stakeholders, interfaces and functional requirements      |
+|      1.2       |                 added use case scenarios and GUI V2                  |
+|      1.3       | updated functional requirements and scenario for manager application |
+|      1.4       |                added class diagram and updated GUI V2                |
+|      1.5       |    added deployment diagram, system design and updated Timesheet     |
 
 # Contents
 

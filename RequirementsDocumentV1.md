@@ -4,9 +4,16 @@ Date:
 
 Version: V1 - description of EZElectronics in CURRENT form (as received by teachers)
 
-| Version number | Change |
-| :------------: | :----: |
-|       1        |        |
+| Version number |                                   Change                                   |
+| :------------: | :------------------------------------------------------------------------: |
+|      1.0       |                               initial commit                               |
+|      1.1       |         added functional requirements, interfaces and stakeholders         |
+|      1.2       |    added context diagram, class diagram and non-functional requirements    |
+|      1.3       |      added stories and personas, deployment diagram and system design      |
+|      1.4       |                added use case diagram and updated Timesheet                |
+|      1.5       |       added use case and relative scenarios and fixed class diagram        |
+|      1.6       | small changes to functional requirement and use case diagram. Added GUI V1 |
+|      1.7       |                      updated GUI V1 and class diagram                      |
 
 # Contents
 
@@ -163,42 +170,42 @@ EZElectronics (read EaSy Electronics) is a software application designed to help
 
 ##### Scenario 1.1
 
-|  Scenario 1.1  |                                            Login                                             |
-| :------------: | :------------------------------------------------------------------------------------------: |
-|  Precondition  |                             User not logged in, user registered                              |
-| Post condition |                                        User logged in                                        |
-|     Step#      |                                         Description                                          |
-|       1        |                              System: ask username and password                               |
-|       2        |                         User: provide correct username and password                          |
-|       3        |                         System: read provided username and password                          |
-|       4        |                          System:check if username and password provided exist                |
-|       5        |                  System: username and password match, user is authenticated                  |
+|  Scenario 1.1  |                           Login                            |
+| :------------: | :--------------------------------------------------------: |
+|  Precondition  |            User not logged in, user registered             |
+| Post condition |                       User logged in                       |
+|     Step#      |                        Description                         |
+|       1        |             System: ask username and password              |
+|       2        |        User: provide correct username and password         |
+|       3        |        System: read provided username and password         |
+|       4        |    System:check if username and password provided exist    |
+|       5        | System: username and password match, user is authenticated |
 
 ##### Scenario 1.2
 
-|  Scenario 1.2  |                                        Wrong password                                        |
-| :------------: | :------------------------------------------------------------------------------------------: |
-|  Precondition  |                             User not logged in, user registered                              |
-| Post condition |                                      User not logged in                                      |
-|     Step#      |                                         Description                                          |
-|       1        |                              System: ask username and password                               |
-|       2        |                              User: provide username or password                              |
-|       3        |                         System: read provided username and password                          |
-|       4        |        System: check if username and password provided exist                                 |
-|       5        |            System: username and password do not match, user is not authenticated             |
+|  Scenario 1.2  |                            Wrong password                             |
+| :------------: | :-------------------------------------------------------------------: |
+|  Precondition  |                  User not logged in, user registered                  |
+| Post condition |                          User not logged in                           |
+|     Step#      |                              Description                              |
+|       1        |                   System: ask username and password                   |
+|       2        |                  User: provide username or password                   |
+|       3        |              System: read provided username and password              |
+|       4        |         System: check if username and password provided exist         |
+|       5        | System: username and password do not match, user is not authenticated |
 
 ##### Scenario 1.3
 
-|  Scenario 1.3  |                                    User is not registered                                    |
-| :------------: | :------------------------------------------------------------------------------------------: |
-|  Precondition  |                           User not logged in, user not registered                            |
-| Post condition |                                      User not logged in                                      |
-|     Step#      |                                         Description                                          |
-|       1        |                              System: ask username and password                               |
-|       2        |                             User: provide username and password                              |
-|       3        |                         System: read provided username and password                          |
-|       4        |                         System: check if username and password provided exist                |
-|       5        |                   System: username is not found, user is not authenticated                   |
+|  Scenario 1.3  |                  User is not registered                  |
+| :------------: | :------------------------------------------------------: |
+|  Precondition  |         User not logged in, user not registered          |
+| Post condition |                    User not logged in                    |
+|     Step#      |                       Description                        |
+|       1        |            System: ask username and password             |
+|       2        |           User: provide username and password            |
+|       3        |       System: read provided username and password        |
+|       4        |  System: check if username and password provided exist   |
+|       5        | System: username is not found, user is not authenticated |
 
 ##### Scenario 1.4
 

@@ -2,11 +2,9 @@
 
 Authors:
 
-Date:
+Date: 05/05/2024
 
-Version:
-
-\<Report here the GUI that you propose for EZElectronics in FUTURE form, as proposed by the team. You are free to organize it as you prefer. A suggested presentation matches the Use cases and scenarios defined in the Requirement document. The GUI can be shown as a sequence of graphical files (jpg, png) >
+Version: 1.2
 
 ![Alt text](./images/GUI2/Home%20Page%20-%20Without%20Login.png)
 ![Alt text](./images/GUI2/Home%20Page%20-%20Customer.png)

@@ -2,11 +2,9 @@
 
 Authors:
 
-Date: 22/04/2024
+Date: 30/04/2024
 
-Version: 1.0
-
-\<Report here the GUI that you propose for EZElectronics in CURRENT form, as received by teachers. You are free to organize it as you prefer. A suggested presentation matches the Use cases and scenarios defined in the Requirement document. The GUI can be shown as a sequence of graphical files (jpg, png) >
+Version: 1.2
 
 ![Alt text](./images/GUI1/Home%20Page%20-%20Without%20Login.png)
 ![Alt text](./images/GUI1/Home%20Page%20-%20Customer.png)
