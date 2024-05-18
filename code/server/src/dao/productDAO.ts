@@ -1,6 +1,5 @@
 /**
  * A class that implements the interaction with the database for all product-related operations.
- * You are free to implement any method you need here, as long as the requirements are satisfied.
  */
 
 import db from "../db/db";
@@ -22,6 +21,11 @@ function mapRowsToFilm(rows: any[]): Product[] {
 }
 
 class ProductDAO {
+
+  /**
+   * Returns all products in the database.
+   * @returns A Promise that resolve to an array of Product objects.
+   */
   getProducts() {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM PRODUCTS";
@@ -36,6 +40,11 @@ class ProductDAO {
     });
   }
 
+  /**
+   * Return the product in the database corresponding to the provided model.
+   * @param model The unique model of the product.
+   * @returns A Promise that resolve to a Product object.
+   */
   getProductByModel(model: String) {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM PRODUCTS WHERE model = ?";
@@ -52,6 +61,11 @@ class ProductDAO {
     });
   }
 
+  /**
+   * Insert the provided product in the database.
+   * @param newProduct The new Product object.
+   * @returns A Promise that resolve to nothing.
+   */
   insertProduct(newProduct: Product) {
     return new Promise((resolve, reject) => {
       const query =
@@ -78,6 +92,12 @@ class ProductDAO {
     });
   }
 
+  /**
+   * Update an existing product of the provided model in the database with the provided info.
+   * @param newProduct The Product object that contains the new info.
+   * @param model The unique model of the product.
+   * @returns A Promise that resolve to nothing.
+   */
   updateProduct(newProduct: Product, model: String) {
     return new Promise((resolve, reject) => {
       const query =
@@ -91,7 +111,7 @@ class ProductDAO {
           newProduct.arrivalDate,
           newProduct.details,
           newProduct.quantity,
-          model
+          model,
         ],
         function (err) {
           if (err) {
@@ -104,11 +124,34 @@ class ProductDAO {
     });
   }
 
-  deleteProductByID(model: String) {
+  /**
+   * Delete the product in the database corresponding to the provided model.
+   * @param model The unique model of the product
+   * @returns A Promise that resolve to nothing.
+   */
+  deleteProductByModel(model: String) {
     return new Promise((resolve, reject) => {
       const query = "DELETE FROM PRODUCTS WHERE model = ?";
 
       db.run(query, [model], function (err) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(this.changes);
+      });
+    });
+  }
+
+  /**
+   * Delete all products in the database.
+   * @returns A Promise that resolve to nothing.
+   */
+  deleteProducts() {
+    return new Promise((resolve, reject) => {
+      const query = "DELETE FROM PRODUCTS";
+
+      db.run(query, [], function (err) {
         if (err) {
           reject(err);
         }
