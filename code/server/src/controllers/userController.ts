@@ -1,5 +1,6 @@
 import { User } from "../components/user"
 import UserDAO from "../dao/userDAO"
+import { Utility } from "../utilities"
 
 /**
  * Represents a controller for managing users.
@@ -29,14 +30,25 @@ class UserController {
      * Returns all users.
      * @returns A Promise that resolves to an array of users.
      */
-    async getUsers() /**:Promise<User[]> */ { }
+    async getUsers() /**:Promise<User[]> */ {
+        return this.dao.getUsers()
+    }
 
     /**
      * Returns all users with a specific role.
      * @param role - The role of the users to retrieve. It can only be one of the three allowed types ("Manager", "Customer", "Admin")
      * @returns A Promise that resolves to an array of users with the specified role.
      */
-    async getUsersByRole(role: string) /**:Promise<User[]> */ { }
+    async getUsersByRole(role: string) /**:Promise<User[]> */ {
+        return new Promise<User[]>((resolve, reject) => {
+            this.dao.getUsers().then(userArray => {
+                const userFiltered = [...userArray].filter(user => user.role == Utility.getRole(role))
+                resolve(userFiltered);
+            }).catch(error => {
+                reject(error)
+            })
+        });
+    }
 
     /**
      * Returns a specific user.
@@ -46,7 +58,9 @@ class UserController {
      * @param username - The username of the user to retrieve. The user must exist.
      * @returns A Promise that resolves to the user with the specified username.
      */
-    async getUserByUsername(user: User, username: string) /**:Promise<User> */ { }
+    async getUserByUsername(user: User, username: string) /**:Promise<User> */ {
+        
+    }
 
     /**
      * Deletes a specific user

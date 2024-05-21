@@ -2,6 +2,7 @@ import db from "../db/db"
 import { User } from "../components/user"
 import crypto from "crypto"
 import { UserAlreadyExistsError, UserNotFoundError } from "../errors/userError";
+import { Utility } from "../utilities";
 
 /**
  * A class that implements the interaction with the database for all user-related operations.
@@ -57,6 +58,8 @@ class UserDAO {
         return new Promise<boolean>((resolve, reject) => {
             try {
                 const salt = crypto.randomBytes(16)
+                // scryptSync is a syncronous functions that generates a password-based key in hexadecimal, 
+                // designed to be computationally expensive. It takes a plain password, unique salt string at least 16 bytes long and KeyLength
                 const hashedPassword = crypto.scryptSync(password, salt, 16)
                 const sql = "INSERT INTO users(username, name, surname, role, password, salt) VALUES(?, ?, ?, ?, ?, ?)"
                 db.run(sql, [username, name, surname, role, hashedPassword, salt], (err: Error | null) => {
@@ -99,6 +102,43 @@ class UserDAO {
             }
 
         })
+    }
+
+
+    /**
+     * Builds a User object from a string array
+     * @param dbRow String array containing the user data read from the database
+     * @returns A Promise that resolves the information of the requested user
+     */
+    mapDBrowToUserObject(dbRow: any): User {
+        return new User(dbRow.username, dbRow.name, dbRow.surname, Utility.getRole(dbRow.role), dbRow.address, dbRow.birthdate);
+    }
+    /**
+     * [Admin reserved function] Returns all users data from the database.
+     * @returns A Promise that resolves the information of the requested user
+     */
+    getUsers(): Promise<User[]> {
+        return new Promise<User[]>((resolve, reject) => {
+            try {
+                const sql = 'SELECT * FROM users';
+                db.all(sql, [], (err: Error | null, rows: any) => {
+                    if(err) {
+                        reject(err);
+                        return;
+                    }
+                    if(!rows) {
+                        reject(new UserNotFoundError());
+                        return;
+                    }
+
+                    let userArray = [...rows].map(row => this.mapDBrowToUserObject(row));
+                    resolve(userArray);
+                });
+            } catch(error) {
+                reject(error);
+            }
+            
+        });
     }
 }
 export default UserDAO
