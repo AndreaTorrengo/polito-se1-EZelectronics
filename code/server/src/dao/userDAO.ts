@@ -1,7 +1,7 @@
 import db from "../db/db"
 import { User } from "../components/user"
 import crypto from "crypto"
-import { UserAlreadyExistsError, UserNotFoundError } from "../errors/userError";
+import { UserAlreadyExistsError, UserNotFoundError, UnauthorizedUserError } from "../errors/userError";
 import { Utility } from "../utilities";
 
 /**
@@ -184,6 +184,38 @@ class UserDAO {
                         return;
                     }
                     resolve(true);
+                });
+            } catch(error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Updates the personal information of one user. The user can only update their own information.
+     * @param user The user who wants to update their information
+     * @param name The new name of the user
+     * @param surname The new surname of the user
+     * @param address The new address of the user
+     * @param birthdate The new birthdate of the user
+     * @param username The username of the user to update. It must be equal to the username of the user parameter.
+     * @returns A Promise that resolves to the updated user
+     */
+    updateUserInfo(user: User, name: string, surname: string, address: string, birthdate: string, username: string) {
+        return new Promise<User>((resolve, reject) => {
+            try {
+                const sql = "UPDATE users SET name=?, surname=?, address=?, birthdate=? WHERE username=?";
+                db.run(sql, [name, surname, address, birthdate, username], function(err) {
+                    if(err){
+                        reject(err);
+                        return;
+                    }
+                    if(!this.changes) {
+                        reject(new UserNotFoundError);
+                        return;
+                    }
+                    // Note: if an admin edits another user, then this promise just return the same admin object
+                    resolve(user);
                 });
             } catch(error) {
                 reject(error);

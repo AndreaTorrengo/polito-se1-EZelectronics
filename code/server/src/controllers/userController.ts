@@ -1,4 +1,4 @@
-import { UserNotAdminError } from "../errors/userError"
+import { UserNotAdminError, UnauthorizedUserError } from "../errors/userError"
 import { User } from "../components/user"
 import UserDAO from "../dao/userDAO"
 import { Utility } from "../utilities"
@@ -95,6 +95,7 @@ class UserController {
 
     /**
      * Updates the personal information of one user. The user can only update their own information.
+     * The admin can edit EVERY user
      * @param user The user who wants to update their information
      * @param name The new name of the user
      * @param surname The new surname of the user
@@ -103,7 +104,13 @@ class UserController {
      * @param username The username of the user to update. It must be equal to the username of the user parameter.
      * @returns A Promise that resolves to the updated user
      */
-    async updateUserInfo(user: User, name: string, surname: string, address: string, birthdate: string, username: string) /**:Promise<User> */ { }
+    async updateUserInfo(user: User, name: string, surname: string, address: string, birthdate: string, username: string) /**:Promise<User> */ {
+        return new Promise<User>((resolve, reject) => {
+            if(Utility.isAdmin(user) || user.username == username)     // todo: I should implement this checks in userRoutes.ts and not inside this controller
+                resolve(this.dao.updateUserInfo(user, name, surname, address, birthdate, username));
+            else reject(new UnauthorizedUserError);
+        });
+    }
 }
 
 export default UserController
