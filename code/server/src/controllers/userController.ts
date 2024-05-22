@@ -1,3 +1,4 @@
+import { UserNotAdminError } from "../errors/userError"
 import { User } from "../components/user"
 import UserDAO from "../dao/userDAO"
 import { Utility } from "../utilities"
@@ -59,7 +60,12 @@ class UserController {
      * @returns A Promise that resolves to the user with the specified username.
      */
     async getUserByUsername(user: User, username: string) /**:Promise<User> */ {
-        
+        return new Promise<User>((resolve, reject) => {
+            // User is admin || User wants to see his personal information
+            if( Utility.isAdmin(user) || user.username == username )
+                resolve(this.dao.getUserByUsername(username));
+            else reject(new UserNotAdminError)
+        });
     }
 
     /**
@@ -70,13 +76,22 @@ class UserController {
      * @param username - The username of the user to delete. The user must exist.
      * @returns A Promise that resolves to true if the user has been deleted.
      */
-    async deleteUser(user: User, username: string) /**:Promise<Boolean> */ { }
+    async deleteUser(user: User, username: string) /**:Promise<Boolean> */ {
+        return new Promise<Boolean>((resolve, reject) => {
+            // User is admin || User wants to delete himself
+            if( Utility.isAdmin(user) || user.username == username )
+                resolve(this.dao.deleteUser(username));
+            else reject(new UserNotAdminError);
+        });
+    }
 
     /**
      * Deletes all non-Admin users
      * @returns A Promise that resolves to true if all non-Admin users have been deleted.
      */
-    async deleteAll() { }
+    async deleteAll() {
+        return this.dao.deleteAll();
+    }
 
     /**
      * Updates the personal information of one user. The user can only update their own information.
