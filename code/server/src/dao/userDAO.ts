@@ -106,13 +106,14 @@ class UserDAO {
 
 
     /**
-     * Builds a User object from a string array
-     * @param dbRow String array containing the user data read from the database
-     * @returns A Promise that resolves the information of the requested user
+     * Builds a User object from a Database Row Object
+     * @param dbRow Row Object containing the user data read from the database
+     * @returns User Object
      */
     mapDBrowToUserObject(dbRow: any): User {
         return new User(dbRow.username, dbRow.name, dbRow.surname, Utility.getRole(dbRow.role), dbRow.address, dbRow.birthdate);
     }
+
     /**
      * [Admin reserved function] Returns all users data from the database.
      * @returns A Promise that resolves the information of the requested user
@@ -137,7 +138,56 @@ class UserDAO {
             } catch(error) {
                 reject(error);
             }
-            
+        });
+    }
+
+    /**
+     * Delete a user in the database, given its username
+     * @returns A Promise that resolves to true if the user is deleted or false if it does not exists
+     */
+    deleteUser(username: string): Promise<Boolean> {
+        return new Promise<Boolean>((resolve, reject) => {
+            try {
+                const sql = 'DELETE FROM users WHERE username=?';
+                db.run(sql, [username], function(err) {
+                    if(err) {
+                        reject(err);
+                        return;
+                    }
+                    if(!this.changes) {
+                        resolve(false);
+                        return;
+                    }
+                    resolve(true);
+                });
+            } catch(error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Delete every non-admin users
+     * @returns A Promise that resolves to true if at least one user is deleted, otherwise resolves to false
+     */
+    deleteAll(): Promise<Boolean> {
+        return new Promise<Boolean>((resolve, reject) => {
+            try {
+                const sql = "DELETE FROM users WHERE role != 'Admin'";
+                db.run(sql, function(err) {
+                    if(err) {
+                        reject(err);
+                        return;
+                    }
+                    if(!this.changes) {
+                        resolve(false);
+                        return;
+                    }
+                    resolve(true);
+                });
+            } catch(error) {
+                reject(error);
+            }
         });
     }
 }
