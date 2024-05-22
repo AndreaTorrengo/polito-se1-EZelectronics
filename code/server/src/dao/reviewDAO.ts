@@ -46,7 +46,7 @@ class ReviewDAO {
                 resolve({error: "Product not found in users's purchased products"});
             } else {
                 sql = "INSERT INTO REVIEW (userID, productID, score, date, comment) VALUES (?, ?, ?, ?, ?)";
-                db.run(sql, [row.userID, row.productID], function (err) {
+                db.run(sql, [row.userID, row.productID, score, date, comment], function (err) {
                     if (err) {
                         reject(err);
                     } else {
