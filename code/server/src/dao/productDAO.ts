@@ -5,28 +5,21 @@
 import db from "../db/db";
 
 import { Product } from "../components/product";
+import { ProductNotFoundError } from "../errors/productError";
 
 function mapRowsToFilm(rows: any[]): Product[] {
   return rows.map(
     (row) =>
-      new Product(
-        row.sellingPrice,
-        row.model,
-        row.category,
-        row.arrivalDate,
-        row.details,
-        row.quantity
-      )
+      new Product(row.sellingPrice, row.model, row.category, row.arrivalDate, row.details, row.quantity)
   );
 }
 
 class ProductDAO {
-
   /**
    * Returns all products in the database.
    * @returns A Promise that resolve to an array of Product objects.
    */
-  getProducts() {
+  getProducts(): Promise<Product[]> {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM PRODUCTS";
 
@@ -45,7 +38,7 @@ class ProductDAO {
    * @param model The unique model of the product.
    * @returns A Promise that resolve to a Product object.
    */
-  getProductByModel(model: String) {
+  getProductByModel(model: String): Promise<Product | ProductNotFoundError> {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM PRODUCTS WHERE model = ?";
 
@@ -53,7 +46,7 @@ class ProductDAO {
         if (err) {
           reject(err);
         } else if (row === undefined) {
-          resolve({ error: "Product not found, check the inserted model!" });
+          resolve(new ProductNotFoundError());
         }
 
         resolve(mapRowsToFilm([row])[0]);
