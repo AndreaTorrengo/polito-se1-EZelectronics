@@ -2,8 +2,8 @@ import { User } from "../components/user";
 import ReviewDAO from "../dao/reviewDAO";
 
 function getCurrentDate(): string {
-    const currentDate = new Date().toISOString().slice(0, 10);
-    return currentDate;
+    const currentDate = new Date();
+    return currentDate.toISOString().slice(0, 10);
 }
 
 class ReviewController {
