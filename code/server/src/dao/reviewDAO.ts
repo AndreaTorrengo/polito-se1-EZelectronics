@@ -21,7 +21,7 @@ function mapRowsToReviews(rows: any[]): ProductReview[] {
 
 class ReviewDAO {
   getReviewsByProduct(model: String) {
-    return new Promise((resolve, reject) => {
+    return new Promise <ProductReview[]>((resolve, reject) => {
       const sql =
         "SELECT P.model, U.username, R.score, R.date, R.comment FROM review AS R, users AS U, products AS P WHERE R.userID=U.userID AND R.productID=P.productID AND P.model = ?";
 
@@ -59,21 +59,21 @@ class ReviewDAO {
   }
 
   deleteUserReview(model: String, username: String) {
-    return new Promise((resolve, reject) => {
+    return new Promise <void>((resolve, reject) => {
         let sql = "SELECT R.reviewID FROM review AS R, users AS U, products AS P WHERE R.userID=U.userID AND R.productID=P.productID AND U.username = ? AND P.model = ?";
 
         db.get(sql, [username, model], (err, row :any) => {
             if (err) {
                 reject(err);
             } else if (row === undefined) {
-                resolve({error: "Review not found"});
+                resolve(/*{error: "Review not found"}*/);
             } else {
                 sql = "DELETE FROM review WHERE reviewID = ?";
                 db.run(sql, [row.productID], function (err) {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(this.changes);
+                        resolve(/*this.changes*/);
                     }
                 })
             }
@@ -82,21 +82,21 @@ class ReviewDAO {
   }
 
   deleteProductReviews(model: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise <void>((resolve, reject) => {
         let sql = "SELECT productID FROM products WHERE model = ?";
 
         db.get(sql, [model], (err, row :any) => {
             if (err) {
                 reject(err);
             } else if (row === undefined) {
-                resolve({error: "Product not found"});
+                resolve(/*{error: "Product not found"}*/);
             } else {
                 sql = "DELETE FROM review WHERE productID = ?";
                 db.run(sql, [row.productID], function (err) {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(this.changes);
+                        resolve(/*this.changes*/);
                     }
                 })
             }
@@ -105,14 +105,14 @@ class ReviewDAO {
   }
 
   deleteReviews() {
-    return new Promise((resolve, reject) => {
+    return new Promise <void>((resolve, reject) => {
         const sql = "DELETE FROM REVIEW";
 
         db.run(sql, [], function (err) {
             if (err) {
               reject(err);
             }
-            resolve(this.changes);
+            resolve(/*this.changes*/);
           });
     })
   }
