@@ -28,7 +28,17 @@ class CartController {
      * @param user - The user for whom to retrieve the cart.
      * @returns A Promise that resolves to the user's cart or an empty one if there is no current cart.
      */
-    async getCart(user: User)/*: Cart*/ { }
+    async getCart(user: User)/*: Cart*/ {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const carts = await this.dao.getUserCarts(user.username)
+                
+                resolve(carts.filter(cart => cart.paid == false)[0]);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
 
     /**
      * Checks out the user's cart. We assume that payment is always successful, there is no need to implement anything related to payment.
@@ -44,7 +54,17 @@ class CartController {
      * @returns A Promise that resolves to an array of carts belonging to the customer.
      * Only the carts that have been checked out should be returned, the current cart should not be included in the result.
      */
-    async getCustomerCarts(user: User) { } /**Promise<Cart[]> */
+    async getCustomerCarts(user: User) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const carts = await this.dao.getUserCarts(user.username);
+
+                resolve(carts.filter(cart => cart.paid == true));
+            } catch (err) {
+                reject(err);
+            }
+        });
+    } /**Promise<Cart[]> */
 
     /**
      * Removes one product unit from the current cart. In case there is more than one unit in the cart, only one should be removed.
@@ -72,7 +92,9 @@ class CartController {
      * Retrieves all carts in the database.
      * @returns A Promise that resolves to an array of carts.
      */
-    async getAllCarts() /*:Promise<Cart[]> */ { }
+    async getAllCarts() /*:Promise<Cart[]> */ {
+        return this.dao.getCarts();
+    }
 }
 
 export default CartController
