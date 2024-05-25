@@ -46,7 +46,20 @@ class CartController {
      * @returns A Promise that resolves to `true` if the cart was successfully checked out.
      * 
      */
-    async checkoutCart(user: User) /**Promise<Boolean> */ { }
+    async checkoutCart(user: User) :Promise<Boolean> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const changes = await this.dao.checkoutUserCart(user.username);
+
+                if (changes === 0) {
+                    resolve(false);
+                }
+                resolve(true);
+            } catch (err) {
+                reject(err);
+            }
+        })
+     }
 
     /**
      * Retrieves all paid carts for a specific customer.
