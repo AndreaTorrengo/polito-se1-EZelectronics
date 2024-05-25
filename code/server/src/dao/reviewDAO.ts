@@ -69,7 +69,7 @@ class ReviewDAO {
                 resolve(/*{error: "Review not found"}*/);
             } else {
                 sql = "DELETE FROM review WHERE reviewID = ?";
-                db.run(sql, [row.productID], function (err) {
+                db.run(sql, [row.reviewID], function (err) {
                     if (err) {
                         reject(err);
                     } else {

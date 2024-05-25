@@ -100,6 +100,43 @@ class CartDAO {
     });
   }
 
+  addToUserCart(username: String, model: String) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT productID FROM products WHERE quantity>0 AND model=?";
+      db.get(sql, [model], (errProductId, rowProductId :any) => {
+        if(errProductId){
+          reject(errProductId);
+        } else if(rowProductId === undefined) {
+          resolve({error: "Product not available"});
+        } else {
+          sql = "SELECT cartID FROM cart AS C, cartProducts AS CP WHERE AND paid=0 AND userID=?";
+          db.get(sql, [username], (errCartId, rowCartId :any) => {
+            if(errCartId){
+              reject(errCartId);
+            } else if(rowCartId === undefined) {
+              //cart does not exists
+              //TODO (create cart and add product with quantity 1)
+            } else {
+              //cart exists
+              sql = "SELECT * FROM cartProduct WHERE cartID=? AND productID=?";
+              db.get(sql, [rowCartId.cartID, rowProductId.productID], (err, row) => {
+                if(err) {
+                  reject(err)
+                } else if(row === undefined) {
+                  //product not in cart
+                  //TODO (add product in cart with quantity 1)
+                } else {
+                  //product already in cart
+                  //TODO (add 1 to the quantity of existing product)
+                }
+              })
+            }
+          })
+        }
+      })
+    })
+  }
+
   checkoutUserCart(username: String) {
     return new Promise((resolve, reject) => {
       let query =
