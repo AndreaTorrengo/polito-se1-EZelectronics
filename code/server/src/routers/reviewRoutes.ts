@@ -4,6 +4,7 @@ import { body, param, query } from "express-validator";
 import ReviewController from "../controllers/reviewController";
 import Authenticator from "./auth";
 import { ProductReview } from "../components/review";
+import { NoReviewProductError } from "../errors/reviewError";
 
 class ReviewRoutes {
   private controller: ReviewController;

@@ -43,7 +43,8 @@ class ReviewController {
         );
 
         if (changes === 0) {
-          throw new ExistingReviewError();
+          //throw new ExistingReviewError();
+          reject(new ExistingReviewError());
         } else {
           resolve();
         }
@@ -63,10 +64,10 @@ class ReviewController {
     return new Promise(async (resolve, reject) => {
       try {
         const productReviews = await this.dao.getReviewsByProduct(model);
-
-        if (productReviews.length === 0) {
-          throw new NoReviewProductError();
-        }
+        /*if (productReviews.length === 0) {
+          //throw new NoReviewProductError();
+          reject(new NoReviewProductError);
+        }*/
         resolve(productReviews);
       } catch (err) {
         reject(err);
@@ -80,7 +81,7 @@ class ReviewController {
    * @param user The user who made the review to delete
    * @returns A Promise that resolves to nothing
    */
-  async deleteReview(model: string, user: User) :Promise<void> {
+  async deleteReview(model: string, user: User): Promise<void> {
     return this.dao.deleteUserReview(model, user.username);
   }
 
@@ -89,15 +90,26 @@ class ReviewController {
    * @param model The model of the product to delete the reviews from
    * @returns A Promise that resolves to nothing
    */
-  async deleteReviewsOfProduct(model: string) :Promise<void> {
-    return this.dao.deleteProductReviews(model);
+  async deleteReviewsOfProduct(model: string): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const changes = await this.dao.deleteProductReviews(model);
+        if (changes === 0) {
+          reject(new NoReviewProductError());
+        } else {
+          resolve();
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   /**
    * Deletes all reviews of all products
    * @returns A Promise that resolves to nothing
    */
-  async deleteAllReviews() :Promise<void> {
+  async deleteAllReviews(): Promise<void> {
     return this.dao.deleteReviews();
   }
 }
