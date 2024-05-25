@@ -1,65 +1,105 @@
+import {
+  ExistingReviewError,
+  NoReviewProductError,
+} from "../errors/reviewError";
 import { User } from "../components/user";
 import ReviewDAO from "../dao/reviewDAO";
+import { ProductReview } from "../components/review";
 
 function getCurrentDate(): string {
-    const currentDate = new Date();
-    return currentDate.toISOString().slice(0, 10);
+  const currentDate = new Date();
+  return currentDate.toISOString().slice(0, 10);
 }
 
 class ReviewController {
-    private dao: ReviewDAO
+  private dao: ReviewDAO;
 
-    constructor() {
-        this.dao = new ReviewDAO
-    }
+  constructor() {
+    this.dao = new ReviewDAO();
+  }
 
-    /**
-     * Adds a new review for a product
-     * @param model The model of the product to review
-     * @param user The username of the user who made the review
-     * @param score The score assigned to the product, in the range [1, 5]
-     * @param comment The comment made by the user
-     * @returns A Promise that resolves to nothing
-     */
-    async addReview(model: string, user: User, score: number, comment: string) /**:Promise<void> */ { 
-        return this.dao.addProductReview(model, user.username, score, comment, getCurrentDate());
-    }
+  /**
+   * Adds a new review for a product
+   * @param model The model of the product to review
+   * @param user The username of the user who made the review
+   * @param score The score assigned to the product, in the range [1, 5]
+   * @param comment The comment made by the user
+   * @returns A Promise that resolves to nothing
+   */
+  async addReview(
+    model: string,
+    user: User,
+    score: number,
+    comment: string
+  ): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const changes = await this.dao.addProductReview(
+          model,
+          user.username,
+          score,
+          comment,
+          getCurrentDate()
+        );
 
-    /**
-     * Returns all reviews for a product
-     * @param model The model of the product to get reviews from
-     * @returns A Promise that resolves to an array of ProductReview objects
-     */
-    async getProductReviews(model: string) /**:Promise<ProductReview[]> */ { 
-        return this.dao.getReviewsByProduct(model);
-    }
+        if (changes === 0) {
+          throw new ExistingReviewError();
+        } else {
+          resolve();
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
 
-    /**
-     * Deletes the review made by a user for a product
-     * @param model The model of the product to delete the review from
-     * @param user The user who made the review to delete
-     * @returns A Promise that resolves to nothing
-     */
-    async deleteReview(model: string, user: User) /**:Promise<void> */ { 
-        return this.dao.deleteUserReview(model, user.username);
-    }
+  /**
+   * Returns all reviews for a product
+   * @param model The model of the product to get reviews from
+   * @returns A Promise that resolves to an array of ProductReview objects
+   */
+  async getProductReviews(model: string): Promise<ProductReview[]> {
+    //return this.dao.getReviewsByProduct(model);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const productReviews = await this.dao.getReviewsByProduct(model);
 
-    /**
-     * Deletes all reviews for a product
-     * @param model The model of the product to delete the reviews from
-     * @returns A Promise that resolves to nothing
-     */
-    async deleteReviewsOfProduct(model: string) /**:Promise<void> */ { 
-        return this.dao.deleteProductReviews(model);
-    }
+        if (productReviews.length === 0) {
+          throw new NoReviewProductError();
+        }
+        resolve(productReviews);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
 
-    /**
-     * Deletes all reviews of all products
-     * @returns A Promise that resolves to nothing
-     */
-    async deleteAllReviews() /**:Promise<void> */ {
-        return this.dao.deleteReviews();
-     }
+  /**
+   * Deletes the review made by a user for a product
+   * @param model The model of the product to delete the review from
+   * @param user The user who made the review to delete
+   * @returns A Promise that resolves to nothing
+   */
+  async deleteReview(model: string, user: User) :Promise<void> {
+    return this.dao.deleteUserReview(model, user.username);
+  }
+
+  /**
+   * Deletes all reviews for a product
+   * @param model The model of the product to delete the reviews from
+   * @returns A Promise that resolves to nothing
+   */
+  async deleteReviewsOfProduct(model: string) :Promise<void> {
+    return this.dao.deleteProductReviews(model);
+  }
+
+  /**
+   * Deletes all reviews of all products
+   * @returns A Promise that resolves to nothing
+   */
+  async deleteAllReviews() :Promise<void> {
+    return this.dao.deleteReviews();
+  }
 }
 
 export default ReviewController;

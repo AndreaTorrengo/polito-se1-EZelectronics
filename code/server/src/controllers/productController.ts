@@ -35,7 +35,7 @@ class ProductController {
     details: string | null,
     sellingPrice: number,
     arrivalDate: string | null
-  ) /**:Promise<void> */ {
+  ) :Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
         const newProduct = new Product(
@@ -53,7 +53,7 @@ class ProductController {
           throw new ProductAlreadyExistsError();
         }
 
-        return Promise.resolve();
+        return resolve();
       } catch (err) {
         reject(err);
       }

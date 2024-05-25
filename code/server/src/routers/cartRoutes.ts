@@ -50,6 +50,7 @@ class CartRoutes {
          */
         this.router.get(
             "/",
+            this.authenticator.isCustomer,
             (req: any, res: any, next: any) => this.controller.getCart(req.user)
                 .then((cart: any /**Cart */) => {
                     res.status(200).json(cart)
@@ -97,6 +98,7 @@ class CartRoutes {
          */
         this.router.get(
             "/history",
+            this.authenticator.isCustomer,
             (req: any, res: any, next: any) => this.controller.getCustomerCarts(req.user)
                 .then((carts: any /**Cart[] */) => res.status(200).json(carts))
                 .catch((err) => next(err))
@@ -149,6 +151,7 @@ class CartRoutes {
          */
         this.router.get(
             "/all",
+            this.authenticator.isAdminOrManager,
             (req: any, res: any, next: any) => this.controller.getAllCarts()
                 .then((carts: any/**Cart[] */) => res.status(200).json(carts))
                 .catch((err: any) => next(err))
