@@ -82,21 +82,21 @@ class ReviewDAO {
   }
 
   deleteProductReviews(model: string) {
-    return new Promise <void>((resolve, reject) => {
+    return new Promise ((resolve, reject) => {
         let sql = "SELECT productID FROM products WHERE model = ?";
 
         db.get(sql, [model], (err, row :any) => {
             if (err) {
                 reject(err);
             } else if (row === undefined) {
-                resolve(/*{error: "Product not found"}*/);
+                resolve({error: "Product not found"});
             } else {
                 sql = "DELETE FROM review WHERE productID = ?";
                 db.run(sql, [row.productID], function (err) {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(/*this.changes*/);
+                        resolve(this.changes);
                     }
                 })
             }
