@@ -116,6 +116,22 @@ class CartDAO {
       })
     })
   }
+
+  getCurrentCartId(username:String) :Promise<Number | undefined> {
+    return new Promise ((resolve, reject) => {
+        const sql = "SELECT cartID FROM cart AS C, user AS U WHERE C.userID=U.userID AND C.paid=0 AND U.username=?";
+        db.get(sql, [username], (err, row :any) => {
+          if(err) {
+            reject(err);
+          } else if (row === undefined) {
+            return row;
+          } else {
+            resolve(row.cartID);
+          }
+        })
+    })
+}
+
 }
 
 export default CartDAO;
