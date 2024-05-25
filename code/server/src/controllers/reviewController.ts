@@ -66,9 +66,8 @@ class ReviewController {
 
         if (productReviews.length === 0) {
           throw new NoReviewProductError();
-        } else {
-          resolve(productReviews);
         }
+        resolve(productReviews);
       } catch (err) {
         reject(err);
       }
