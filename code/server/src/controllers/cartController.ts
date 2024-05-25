@@ -91,7 +91,7 @@ class CartController {
      * @returns A Promise that resolves to `true` if the product was successfully removed.
      */
     async removeProductFromCart(user: User, product: string) /**Promise<Boolean> */ {
-        
+        // Todo (Andrea)
     }
 
 
@@ -107,7 +107,7 @@ class CartController {
      * @returns A Promise that resolves to `true` if all carts were successfully deleted.
      */
     async deleteAllCarts() /**Promise<Boolean> */ {
-        
+        return this.dao.deleteAllCarts();
     }
 
     /**

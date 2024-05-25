@@ -152,11 +152,13 @@ class CartDAO {
       try {
         const cartID = await this.getCurrentCartId(username);
 
-        // if the quantity of the product to remove on the cart > 1, then set quantity -= 1
+        // if the quantity of the product to remove on the cart is > 1, then set quantity -= 1 of cartProducts record
 
-        // if the quantity 
+        // if the quantity is 1, then DELETE cartProducts record
 
-        const sql = 'DELETE FROM carts';
+        // if the quantity is 0 or else, reject(...)
+
+        const sql = 'todo';
       } catch(error) {
         reject(false);
       }
