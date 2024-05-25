@@ -45,15 +45,18 @@ class CartController {
      * @param user - The user whose cart should be checked out.
      * @returns A Promise that resolves to `true` if the cart was successfully checked out.
      * 
+     * 
      */
     async checkoutCart(user: User) :Promise<Boolean> {
         return new Promise(async (resolve, reject) => {
             try {
+                // TODO: check availability for each product in cart
                 const changes = await this.dao.checkoutUserCart(user.username);
 
                 if (changes === 0) {
                     resolve(false);
                 }
+                // TODO: reduce quantity of ordered product
                 resolve(true);
             } catch (err) {
                 reject(err);
@@ -85,7 +88,9 @@ class CartController {
      * @param product The model of the product to remove.
      * @returns A Promise that resolves to `true` if the product was successfully removed.
      */
-    async removeProductFromCart(user: User, product: string) /**Promise<Boolean> */ { }
+    async removeProductFromCart(user: User, product: string) /**Promise<Boolean> */ {
+        
+    }
 
 
     /**
@@ -99,7 +104,9 @@ class CartController {
      * Deletes all carts of all users.
      * @returns A Promise that resolves to `true` if all carts were successfully deleted.
      */
-    async deleteAllCarts() /**Promise<Boolean> */ { }
+    async deleteAllCarts() /**Promise<Boolean> */ {
+        
+    }
 
     /**
      * Retrieves all carts in the database.

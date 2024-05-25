@@ -64,9 +64,9 @@ class CartDAO {
   }
 
   /**
-   *
+   * 
    * @param username
-   * @returns
+   * @returns a list of all carts of the given username.
    */
   getUserCarts(username: String): Promise<Cart[]> {
     return new Promise((resolve, reject) => {
@@ -115,6 +115,48 @@ class CartDAO {
         }
       })
     })
+  }
+
+
+/**
+ * Removes one product unit from the current cart (paid==0). In case there is more than one unit in the cart, only one should be removed.
+ * @param user The user who owns the cart.
+ * @param product The model of the product to remove.
+ * @returns A Promise that resolves to `true` if the product was successfully removed.
+ */
+  removeProductFromCart(username: string, product: string): Promise<Boolean> {
+    return new Promise<Boolean>(async (resolve, reject) => {
+      try {
+        const cartID = await this.getCurrentCartId(username);
+
+        // if the quantity of the product to remove on the cart > 1, then set quantity -= 1
+
+        // if the quantity 
+
+        const sql = 'DELETE FROM carts';
+      } catch(error) {
+        reject(false);
+      }
+    });
+  }
+  /**
+   * @returns A Promise that resolves to `true` if all db products are successfully removed.
+   */
+  deleteAllCarts() {
+    return new Promise<Boolean>((resolve, reject) => {
+      try {
+        const sql = 'DELETE FROM carts';
+        db.run(sql, function(err) {
+          if(err) {
+            reject(false);
+            return;
+          }
+          resolve(true);
+        });
+      } catch(error) {
+        reject(false);
+      }
+    });
   }
 }
 
