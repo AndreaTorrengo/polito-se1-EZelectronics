@@ -9,7 +9,13 @@ const mapRowsToCart = (cartRows: any, productRows: any): Cart[] => {
   const carts: Cart[] = [];
 
   cartRows.forEach((cartRow: any) => {
-    let currentCart = new Cart(cartRow.username, cartRow.paid, cartRow.paymentDate, 0, []);
+    let currentCart = new Cart(
+      cartRow.username,
+      cartRow.paid,
+      cartRow.paymentDate,
+      0,
+      []
+    );
 
     productRows.forEach((productRow: any) => {
       if (productRow.cartID === cartRow.cartID) {
@@ -96,25 +102,42 @@ class CartDAO {
 
   checkoutUserCart(username: String) {
     return new Promise((resolve, reject) => {
-      let query = "SELECT cartID FROM users AS U, cart AS C WHERE U.userID=C.userID AND C.paid=0 AND U.username=?";
-      
-      db.get(query, [username], (err, row :any) => {
+      let query =
+        "SELECT cartID FROM users AS U, cart AS C WHERE U.userID=C.userID AND C.paid=0 AND U.username=?";
+
+      db.get(query, [username], (err, row: any) => {
         if (err) {
           reject(err);
         } else if (row === undefined) {
-          resolve({error: "This user doesn't have a current cart"});
+          resolve({ error: "This user doesn't have a current cart" });
         } else {
-          query = "UPDATE cart SET paid=1 WHERE cartID=?"
+          query = "UPDATE cart SET paid=1 WHERE cartID=?";
           db.run(query, [row.cartID], function (err) {
-            if(err) {
+            if (err) {
               reject(err);
             } else {
               resolve(this.changes);
             }
-          })
+          });
         }
-      })
-    })
+      });
+    });
+  }
+
+  getCurrentCartId(username: String): Promise<Number | undefined> {
+    return new Promise((resolve, reject) => {
+      const sql =
+        "SELECT cartID FROM cart AS C, user AS U WHERE C.userID=U.userID AND C.paid=0 AND U.username=?";
+      db.get(sql, [username], (err, row: any) => {
+        if (err) {
+          reject(err);
+        } else if (row === undefined) {
+          return row;
+        } else {
+          resolve(row.cartID);
+        }
+      });
+    });
   }
 
 
