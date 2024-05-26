@@ -184,7 +184,17 @@ class CartDAO {
                 resolve(await this.insertNewProductInCart(cartId, rowProductId.productID))
               } else {
                 //product already in cart
-                //TODO (add 1 to the quantity of existing product)
+                //(add 1 to the quantity of existing product)
+                sql = "UPDATE cartProducts SET quantity = quantity + 1 WHERE cartID=? AND productID=?";
+                db.run(sql, [cartId, rowProductId.productID], function (err) {
+                  if(err){
+                    reject(err);
+                  } else if(this.changes === 0) {
+                    resolve(false);
+                  } else {
+                    resolve(true);
+                  }
+                })
               }
             });
           }
