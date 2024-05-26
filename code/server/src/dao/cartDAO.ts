@@ -194,7 +194,7 @@ class CartDAO {
                   } else {
                     resolve(true);
                   }
-                })
+                });
               }
             });
           }
