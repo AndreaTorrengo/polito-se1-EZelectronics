@@ -198,7 +198,9 @@ class CartDAO {
           resolve(false);
         } else {
           const cartId = await this.getCurrentCartId(username);
-          if (cartId === undefined) {
+          const result = await this.editProductInCartQuantity(cartId, username, model, 1);
+          resolve(result);
+          /*if (cartId === undefined) {
             //cart does not exists
             //(create cart and add product with quantity 1)
             resolve(await this.createNewCart(username, rowProductId.productID));
@@ -227,7 +229,7 @@ class CartDAO {
                 });
               }
             });
-          }
+          }*/
         }
       });
     });
@@ -317,18 +319,31 @@ class CartDAO {
    * @param cartID Cart identifier. Can be undefined, in that case a new unpaid cart will be inserted on the database
    * @param username Owner of the cart
    * @param model Model of the product
-   * @param productInCart The product object inside the cart, whose quantity will be updated.
+   * @param delta Increment to the quantity (such as 1 or -1)
    * @returns A Promise that resolves to `true` if the quantity has been successfully updated
    */
-  editProductInCartQuantity(cartID: Number, username: String, model: String, productInCart: any, updatedQuantity: Number): Promise<boolean> {
+  editProductInCartQuantity(cartID: Number, username: String, model: String, delta: number): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const productId = await this.getProductIdFromModel(model);
-        // If the cart does not exists, then insert a new one on the database
+        // Get the user current cart Row (not paid yet). Format: {username, paid, paymentDate, total, products: [{model, quantity, category, price}, {productInCart_2}, {productInCart_3}, ...]}
+        const cartRow = await this.getUserCurrentCart(username);
+        let updatedQuantity;  // default value will be 1 for adding a new product to the cart
+        let productInCart;
+
+        if(cartRow) {
+          productInCart = cartRow.products.find(prod => prod.model === model);  // Extract the product object inside the cart
+          // Compute the updated quantity of the product (if already is in the cart)
+          updatedQuantity = productInCart ? productInCart.quantity + delta : 1;
+        } else {
+          //reject(new CartNotFoundError());
+        }
+        
+        // If the cart does not exists, then insert a new one on the database, and insert the cartProduct record
         if(!cartID)
           await this.createNewCart(username, productId);
         // If cartProduct record doesn't exists on the database, create a new one
-        if(!productInCart)
+        else if(!productInCart)
           await this.insertNewProductInCart(cartID, productId, updatedQuantity);
         // if the quantity of the product to remove on the cart is > 0, then update cartProducts record
         else if(Number(updatedQuantity) > 0)
@@ -365,16 +380,8 @@ class CartDAO {
           reject(new CartNotFoundError());
           return;
         }
-        // Get the user current cart Row (not paid yet). Format: {username, paid, paymentDate, total, products: [{model, quantity, category, price}, {productInCart_2}, {productInCart_3}, ...]}
-        const cartRow = await this.getUserCurrentCart(username);
-        if(!cartRow) {
-          reject(new CartNotFoundError());
-          return;
-        }
-        // Extract the product object inside the cart
-        const productInCart = cartRow.products.find(prod => prod.model === product);
         
-        const result = await this.editProductInCartQuantity(cartID, username, product, productInCart, productInCart.quantity - 1);
+        const result = await this.editProductInCartQuantity(cartID, username, product, -1);
         resolve(result);
       } catch (error) {
         reject(false);
