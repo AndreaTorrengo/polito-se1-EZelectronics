@@ -2,8 +2,10 @@
  * A class that implements the interaction with the database for all cart-related operations.
  */
 
+import { CartNotFoundError } from "../errors/cartError";
 import { Cart, ProductInCart } from "../components/cart";
 import db from "../db/db";
+import { ProductNotFoundError } from "../errors/productError";
 
 const mapRowsToCart = (cartRows: any, productRows: any): Cart[] => {
   const carts: Cart[] = [];
@@ -116,11 +118,11 @@ class CartDAO {
     });
   }
 
-  insertNewProductInCart(cartId: Number, productId: Number): Promise<Boolean> {
+  insertNewProductInCart(cartId: Number, productId: Number, quantity: Number): Promise<Boolean> {
     return new Promise((resolve, reject) => {
       const sql =
-        "INSERT INTO cartProducts (cartID, productID, quantity) VALUES (?,?,1)";
-      db.run(sql, [cartId, productId], function (err) {
+        "INSERT INTO cartProducts (cartID, productID, quantity) VALUES (?,?,?)";
+      db.run(sql, [cartId, productId, quantity], function (err) {
         if (err) {
           reject(err);
         } else if (this.changes === 0) {
@@ -150,7 +152,7 @@ class CartDAO {
               if (cartId === undefined) {
                 resolve(false);
               }
-              resolve(await this.insertNewProductInCart(cartId, productId));
+              resolve(await this.insertNewProductInCart(cartId, productId, 1));
             }
           });
         }
@@ -181,7 +183,7 @@ class CartDAO {
               } else if (row === undefined) {
                 //product not in cart
                 //(add product in cart with quantity 1)
-                resolve(await this.insertNewProductInCart(cartId, rowProductId.productID))
+                resolve(await this.insertNewProductInCart(cartId, rowProductId.productID, 1))
               } else {
                 //product already in cart
                 //(add 1 to the quantity of existing product)
@@ -228,23 +230,115 @@ class CartDAO {
   }
 
   /**
+   * @param model model of the product
+   * @returns productId
+   */
+  getProductIdFromModel(model: String): Promise<Number> {
+    return new Promise<Number>((resolve, reject) => {
+      let sql = "SELECT productID FROM products WHERE quantity>0 AND model=?";
+      db.get(sql, [model], async (errProductId, rowProduct: any) => {
+        if (errProductId) {
+          reject(errProductId);
+          return;
+        } else if (rowProduct === undefined) {
+          reject(new ProductNotFoundError());
+          return;
+        }
+        resolve(rowProduct.productID);
+      });
+    });
+  }
+  /** Update the cartProducts quantity on the database
+   * @param cartID
+   * @param productId
+   * @param updatedQuantity number that will overwrite the previous one stored in the database
+   * @returns number of changes (should be 1)
+   */
+  updateCartProductRecord(cartID: Number, productId: Number, updatedQuantity: Number): Promise<Number> {
+    return new Promise<Number>((resolve, reject) => {
+      const sql = "UPDATE cartProducts SET quantity = ? WHERE cartID=? AND productID=?";
+      db.run(sql, [updatedQuantity, cartID, productId], function (err) {
+        if(err){
+          reject(err);
+          return;
+        } 
+        resolve(this.changes);
+      });
+    });
+  }
+  /** Delete a cartProduct record on the database (should be called if quantity of the product reaches zero)
+   * @param cartID
+   * @param productId
+   * @returns number of changes (should be 1)
+   */
+  deleteCartProductRecord(cartID: Number, productId: Number): Promise<Number> {
+    return new Promise<Number>((resolve, reject) => {
+      
+    });
+  }
+
+  /**
+   * Fix the quantity of a given product inside the cart
+   * @param cartID Cart identifier. Can be undefined, in that case a new unpaid cart will be inserted on the database
+   * @param username Owner of the cart
+   * @param model Model of the product
+   * @param productInCart The product object inside the cart, whose quantity will be updated.
+   * @returns A Promise that resolves to `true` if the quantity has been successfully updated
+   */
+  editProductInCartQuantity(cartID: Number, username: String, model: String, productInCart: any, updatedQuantity: Number): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        const productId = await this.getProductIdFromModel(model);
+        // If the cart does not exists, then insert a new one on the database
+        if(!cartID)
+          await this.createNewCart(username, productId);
+        // If cartProduct record doesn't exists on the database, create a new one
+        if(!productInCart)
+          await this.insertNewProductInCart(cartID, productId, updatedQuantity);
+        // if the quantity of the product to remove on the cart is > 0, then update cartProducts record
+        else if(Number(updatedQuantity) > 0)
+          await this.updateCartProductRecord(cartID, productId, updatedQuantity);
+        else
+          await this.deleteCartProductRecord(cartID, productId);
+  
+        // If the cart remains empty (after an eventual deletion), delete the cart
+        // todo
+
+        resolve(true);
+      } catch(error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
    * Removes one product unit from the current cart (paid==0). In case there is more than one unit in the cart, only one should be removed.
    * @param user The user who owns the cart.
    * @param product The model of the product to remove.
    * @returns A Promise that resolves to `true` if the product was successfully removed.
    */
-  removeProductFromCart(username: string, product: string): Promise<Boolean> {
+  removeProductFromCart(username: String, product: String): Promise<Boolean> {
     return new Promise<Boolean>(async (resolve, reject) => {
       try {
-        const cartID = await this.getCurrentCartId(username);
+        const cartID = (await this.getCurrentCartId(username));
+        const productID = (await this.getProductIdFromModel(product));
 
-        // if the quantity of the product to remove on the cart is > 1, then set quantity -= 1 of cartProducts record
+        // Check whether the cart exists
+        if(!cartID) {
+          reject(new CartNotFoundError());
+          return;
+        }
+        // Get the user current cart Row (not paid yet). Format: {username, paid, paymentDate, total, products: [{model, quantity, category, price}, {productInCart_2}, {productInCart_3}, ...]}
+        const cartRow = (await this.getUserCarts(username)).find(row => !(row.paid));
+        if(!cartRow) {
+          reject(new CartNotFoundError());
+          return;
+        }
+        // Extract the product object inside the cart
+        const productInCart = cartRow.products.find(prod => prod.model === product);
+        
+        this.editProductInCartQuantity(cartID, username, product, productInCart, productInCart.quantity - 1);
 
-        // if the quantity is 1, then DELETE cartProducts record
-
-        // if the quantity is 0 or else, reject(...)
-
-        const sql = "todo";
       } catch (error) {
         reject(false);
       }
