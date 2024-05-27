@@ -176,7 +176,7 @@ class CartDAO {
             resolve(await this.createNewCart(username, rowProductId.productID));
           } else {
             //cart exists
-            sql = "SELECT * FROM cartProduct WHERE cartID=? AND productID=?";
+            sql = "SELECT * FROM cartProducts WHERE cartID=? AND productID=?";
             db.get(sql, [cartId, rowProductId.productID], async (err, row) => {
               if (err) {
                 reject(err);
