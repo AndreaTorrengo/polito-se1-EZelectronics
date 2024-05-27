@@ -2,7 +2,7 @@
  * A class that implements the interaction with the database for all cart-related operations.
  */
 
-import { CartNotFoundError } from "../errors/cartError";
+import { CartNotFoundError, EmptyCartError } from "../errors/cartError";
 import { Cart, ProductInCart } from "../components/cart";
 import db from "../db/db";
 import { ProductNotFoundError } from "../errors/productError";
@@ -101,6 +101,34 @@ class CartDAO {
       });
     });
   }
+  /**
+   * @param username
+   * @returns the user's current cart object. If does not exists, return undefined
+   */
+  getUserCurrentCart(username: String): Promise<Cart | undefined> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const userCarts = await this.getUserCarts(username);
+        // May be a user who has not purchased anything yet and with empty cart
+        if(!userCarts.length) {
+          resolve(undefined);
+          return;
+        }
+        const currentCart = userCarts.find(row => !row.paid);   // find() returns undefined if there is no match
+        resolve(currentCart);
+      } catch(error) {
+        reject(error);
+      }
+    });
+  }
+  /**
+   * @param username
+   * @returns a dummy cart object. That is used when a user has its cart empty (does not exists on the database)
+   */
+  getDummyCart(username: string): Cart {
+    return new Cart(username, false, null, 0, []);
+  }
+
 
   getCurrentCartId(username: String): Promise<Number | undefined> {
     return new Promise((resolve, reject) => {
@@ -273,7 +301,14 @@ class CartDAO {
    */
   deleteCartProductRecord(cartID: Number, productId: Number): Promise<Number> {
     return new Promise<Number>((resolve, reject) => {
-      
+      const sql = "DELETE FROM cartProducts WHERE cartID=? AND productID=?";
+      db.run(sql, [cartID, productId], function (err) {
+        if(err){
+          reject(err);
+          return;
+        } 
+        resolve(this.changes);
+      });
     });
   }
 
@@ -298,11 +333,14 @@ class CartDAO {
         // if the quantity of the product to remove on the cart is > 0, then update cartProducts record
         else if(Number(updatedQuantity) > 0)
           await this.updateCartProductRecord(cartID, productId, updatedQuantity);
-        else
+        else{
           await this.deleteCartProductRecord(cartID, productId);
-  
-        // If the cart remains empty (after an eventual deletion), delete the cart
-        // todo
+          
+          // If the cart remains empty, delete the whole cart
+          const currentCart = await this.getUserCurrentCart(username);
+          if(currentCart && currentCart.products.length == 0)
+            await this.deleteUserCart(cartID);
+        }
 
         resolve(true);
       } catch(error) {
@@ -321,7 +359,6 @@ class CartDAO {
     return new Promise<Boolean>(async (resolve, reject) => {
       try {
         const cartID = (await this.getCurrentCartId(username));
-        const productID = (await this.getProductIdFromModel(product));
 
         // Check whether the cart exists
         if(!cartID) {
@@ -329,7 +366,7 @@ class CartDAO {
           return;
         }
         // Get the user current cart Row (not paid yet). Format: {username, paid, paymentDate, total, products: [{model, quantity, category, price}, {productInCart_2}, {productInCart_3}, ...]}
-        const cartRow = (await this.getUserCarts(username)).find(row => !(row.paid));
+        const cartRow = await this.getUserCurrentCart(username);
         if(!cartRow) {
           reject(new CartNotFoundError());
           return;
@@ -337,8 +374,27 @@ class CartDAO {
         // Extract the product object inside the cart
         const productInCart = cartRow.products.find(prod => prod.model === product);
         
-        this.editProductInCartQuantity(cartID, username, product, productInCart, productInCart.quantity - 1);
-
+        const result = await this.editProductInCartQuantity(cartID, username, product, productInCart, productInCart.quantity - 1);
+        resolve(result);
+      } catch (error) {
+        reject(false);
+      }
+    });
+  }
+  /** This function works as 'Cart empty'
+   * @returns A Promise that resolves to `true` if the cart is successfully deleted.
+   */
+  deleteUserCart(cartID: Number): Promise<Boolean> {
+    return new Promise<Boolean>((resolve, reject) => {
+      try {
+        const sql = "DELETE FROM cart WHERE cartID=?";
+        db.run(sql, [cartID], function (err) {
+          if (err) {
+            reject(false);
+            return;
+          }
+          resolve(true);
+        });
       } catch (error) {
         reject(false);
       }
@@ -347,7 +403,7 @@ class CartDAO {
   /**
    * @returns A Promise that resolves to `true` if all db products are successfully removed.
    */
-  deleteAllCarts() {
+  deleteAllCarts(): Promise<Boolean> {
     return new Promise<Boolean>((resolve, reject) => {
       try {
         const sql = "DELETE FROM carts";

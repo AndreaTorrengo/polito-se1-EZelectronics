@@ -1,3 +1,4 @@
+import { CartNotFoundError, EmptyCartError } from "../errors/cartError";
 import { User } from "../components/user";
 import CartDAO from "../dao/cartDAO";
 
@@ -35,9 +36,15 @@ class CartController {
     async getCart(user: User)/*: Cart*/ {
         return new Promise(async (resolve, reject) => {
             try {
-                const carts = await this.dao.getUserCarts(user.username)
-                
-                resolve(carts.filter(cart => cart.paid == false)[0]);
+                /*const carts = await this.dao.getUserCarts(user.username)
+                resolve(carts.filter(cart => cart.paid == false)[0]);*/
+                const currentCart = await this.dao.getUserCurrentCart(user.username);
+                if(!currentCart) {
+                    //reject(new EmptyCartError());
+                    resolve(this.dao.getDummyCart(user.username));
+                    return;
+                }
+                resolve(currentCart);
             } catch (err) {
                 reject(err);
             }
@@ -93,7 +100,7 @@ class CartController {
      * @returns A Promise that resolves to `true` if the product was successfully removed.
      */
     async removeProductFromCart(user: User, product: string) /**Promise<Boolean> */ {
-        // Todo (Andrea)
+        return this.dao.removeProductFromCart(user.username, product);
     }
 
 
@@ -102,7 +109,21 @@ class CartController {
      * @param user - The user who owns the cart.
      * @returns A Promise that resolves to `true` if the cart was successfully cleared.
      */
-    async clearCart(user: User)/*:Promise<Boolean> */ { }
+    async clearCart(user: User)/*:Promise<Boolean> */ {
+        return new Promise<Boolean>(async (resolve, reject) => {
+            try {
+                const currentCartID = await this.dao.getCurrentCartId(user.username);
+                if(!currentCartID){
+                    reject(new CartNotFoundError());
+                    return;
+                }
+                const result = await this.dao.deleteUserCart(currentCartID);
+                resolve(result);
+            } catch(error) {
+                reject(error);
+            }
+        });
+    }
 
     /**
      * Deletes all carts of all users.
