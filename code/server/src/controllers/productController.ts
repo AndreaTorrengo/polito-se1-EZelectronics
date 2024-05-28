@@ -6,6 +6,11 @@ import {
   ProductAlreadyExistsError,
   ProductNotFoundError,
 } from "../errors/productError";
+import { DateError } from "../utilities";
+
+const now = (): string => {
+  return (new Date()).toISOString().split("T")[0];
+}
 
 /**
  * Represents a controller for managing products.
@@ -35,25 +40,33 @@ class ProductController {
     details: string | null,
     sellingPrice: number,
     arrivalDate: string | null
-  ) :Promise<void> {
+  ): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
+        const product = await this.dao.getProductByModel(model);
+
+        if (product instanceof Product) {
+          throw new ProductAlreadyExistsError();
+        }
+
+        const date = arrivalDate ? arrivalDate : now();
+
+        if (date > now()) {
+          throw new DateError();
+        }
+
         const newProduct = new Product(
           sellingPrice,
           model,
           category as Category,
-          arrivalDate,
+          date,
           details,
           quantity
         );
 
         const changes = await this.dao.insertProduct(newProduct);
 
-        if (changes === 0) {
-          throw new ProductAlreadyExistsError();
-        }
-
-        return resolve();
+        resolve();
       } catch (err) {
         reject(err);
       }
@@ -80,11 +93,17 @@ class ProductController {
           throw new ProductNotFoundError();
         }
 
+        const date = changeDate ? changeDate : now();
+
+        if (date > now() || date < oldProduct.arrivalDate) {
+          throw new DateError();
+        }
+
         const newProduct = new Product(
           oldProduct.sellingPrice,
           model,
           oldProduct.category,
-          changeDate,
+          changeDate ? changeDate : new Date().toISOString().split("T")[0],
           oldProduct.details,
           newQuantity + oldProduct.quantity
         );
@@ -122,6 +141,12 @@ class ProductController {
 
         if (newQuantity < 0) {
           throw new LowProductStockError();
+        }
+
+        const date = sellingDate ? sellingDate : now();
+
+        if (date > now() || date < oldProduct.arrivalDate) {
+          throw new DateError();
         }
 
         const newProduct = new Product(

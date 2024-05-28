@@ -7,7 +7,7 @@ import db from "../db/db";
 import { Product } from "../components/product";
 import { ProductNotFoundError } from "../errors/productError";
 
-function mapRowsToFilm(rows: any[]): Product[] {
+function mapRowsToProduct(rows: any[]): Product[] {
   return rows.map(
     (row) =>
       new Product(row.sellingPrice, row.model, row.category, row.arrivalDate, row.details, row.quantity)
@@ -28,7 +28,7 @@ class ProductDAO {
           reject(err);
         }
 
-        resolve(mapRowsToFilm(rows));
+        resolve(mapRowsToProduct(rows));
       });
     });
   }
@@ -47,9 +47,9 @@ class ProductDAO {
           reject(err);
         } else if (row === undefined) {
           resolve(new ProductNotFoundError());
+        } else {
+          resolve(mapRowsToProduct([row])[0]);
         }
-
-        resolve(mapRowsToFilm([row])[0]);
       });
     });
   }
