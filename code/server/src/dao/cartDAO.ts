@@ -413,7 +413,7 @@ class CartDAO {
   deleteAllCarts(): Promise<Boolean> {
     return new Promise<Boolean>((resolve, reject) => {
       try {
-        const sql = "DELETE FROM carts";
+        const sql = "DELETE FROM cart";
         db.run(sql, function (err) {
           if (err) {
             reject(false);
