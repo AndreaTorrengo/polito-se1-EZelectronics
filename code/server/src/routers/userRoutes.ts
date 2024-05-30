@@ -221,6 +221,9 @@ class AuthRoutes {
          */
         this.router.post(
             "/",
+            body('username').isString().notEmpty(),
+            body('password').isString().notEmpty(),
+            this.errorHandler.validateRequest,
             (req, res, next) => this.authService.login(req, res, next)
                 .then((user: User) => res.status(200).json(user))
                 .catch((err: any) => { res.status(401).json(err) })
@@ -233,6 +236,8 @@ class AuthRoutes {
          */
         this.router.delete(
             "/current",
+            this.authService.isLoggedIn,
+            this.errorHandler.validateRequest,
             (req, res, next) => this.authService.logout(req, res, next)
                 .then(() => res.status(200).end())
                 .catch((err: any) => next(err))
@@ -245,6 +250,8 @@ class AuthRoutes {
          */
         this.router.get(
             "/current",
+            this.authService.isLoggedIn,
+            this.errorHandler.validateRequest,
             (req: any, res: any) => res.status(200).json(req.user)
         )
     }
