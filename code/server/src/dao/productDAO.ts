@@ -26,9 +26,9 @@ class ProductDAO {
       db.all(query, [], (err, rows) => {
         if (err) {
           reject(err);
+        } else {
+          resolve(mapRowsToProduct(rows));
         }
-
-        resolve(mapRowsToProduct(rows));
       });
     });
   }
@@ -77,9 +77,9 @@ class ProductDAO {
         function (err) {
           if (err) {
             reject(err);
+          } else {
+            resolve(true);
           }
-
-          resolve(this.changes);
         }
       );
     });
@@ -109,9 +109,9 @@ class ProductDAO {
         function (err) {
           if (err) {
             reject(err);
+          } else {
+            resolve(true);
           }
-
-          resolve(this.changes);
         }
       );
     });
@@ -129,9 +129,9 @@ class ProductDAO {
       db.run(query, [model], function (err) {
         if (err) {
           reject(err);
+        } else {
+          resolve(true);
         }
-
-        resolve(this.changes);
       });
     });
   }
@@ -147,9 +147,9 @@ class ProductDAO {
       db.run(query, [], function (err) {
         if (err) {
           reject(err);
+        } else {
+          resolve(true);
         }
-
-        resolve(this.changes);
       });
     });
   }

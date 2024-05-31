@@ -9,8 +9,8 @@ import {
 import { DateError } from "../utilities";
 
 const now = (): string => {
-  return (new Date()).toISOString().split("T")[0];
-}
+  return new Date().toISOString().split("T")[0];
+};
 
 /**
  * Represents a controller for managing products.
@@ -55,14 +55,7 @@ class ProductController {
           throw new DateError();
         }
 
-        const newProduct = new Product(
-          sellingPrice,
-          model,
-          category as Category,
-          date,
-          details,
-          quantity
-        );
+        const newProduct = new Product(sellingPrice, model, category as Category, date, details, quantity);
 
         const changes = await this.dao.insertProduct(newProduct);
 
@@ -84,7 +77,7 @@ class ProductController {
     model: string,
     newQuantity: number,
     changeDate: string | null
-  ) /**:Promise<number> */ {
+  ): Promise<number> {
     return new Promise(async (resolve, reject) => {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
@@ -124,7 +117,7 @@ class ProductController {
    * @param sellingDate The optional date in which the sale occurred.
    * @returns A Promise that resolves to the new available quantity of the product.
    */
-  async sellProduct(model: string, quantity: number, sellingDate: string | null) /**:Promise<number> */ {
+  async sellProduct(model: string, quantity: number, sellingDate: string | null): Promise<number> {
     return new Promise(async (resolve, reject) => {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
@@ -178,7 +171,7 @@ class ProductController {
     grouping: string | null,
     category: string | null,
     model: string | null
-  ) /**Promise<Product[]> */ {
+  ): Promise<Product[]> {
     return new Promise(async (resolve, reject) => {
       try {
         let products = await this.dao.getProducts();
@@ -211,7 +204,7 @@ class ProductController {
     grouping: string | null,
     category: string | null,
     model: string | null
-  ) /**:Promise<Product[]> */ {
+  ): Promise<Product[]> {
     return new Promise(async (resolve, reject) => {
       try {
         const products = (await this.dao.getProducts()).filter((p) => p.quantity > 0);
@@ -233,14 +226,10 @@ class ProductController {
    * Deletes all products.
    * @returns A Promise that resolves to `true` if all products have been successfully deleted.
    */
-  async deleteAllProducts() /**:Promise <Boolean> */ {
+  async deleteAllProducts(): Promise<Boolean> {
     return new Promise(async (resolve, reject) => {
       try {
         const changes = await this.dao.deleteProducts();
-
-        if (changes === 0) {
-          resolve(false);
-        }
 
         resolve(true);
       } catch (err) {
@@ -254,14 +243,16 @@ class ProductController {
    * @param model The model of the product to delete
    * @returns A Promise that resolves to `true` if the product has been successfully deleted.
    */
-  async deleteProduct(model: string) /**:Promise <Boolean> */ {
+  async deleteProduct(model: string): Promise<Boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        const changes = await this.dao.deleteProductByModel(model);
+        const oldProduct = await this.dao.getProductByModel(model);
 
-        if (changes === 0) {
-          resolve(false);
+        if (oldProduct instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
         }
+
+        const changes = await this.dao.deleteProductByModel(model);
 
         resolve(true);
       } catch (err) {
