@@ -253,6 +253,12 @@ class ProductController {
   async deleteProduct(model: string) /**:Promise <Boolean> */ {
     return new Promise(async (resolve, reject) => {
       try {
+        const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
+
         const changes = await this.dao.deleteProductByModel(model);
 
         resolve(true);
