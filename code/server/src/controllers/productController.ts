@@ -238,10 +238,6 @@ class ProductController {
       try {
         const changes = await this.dao.deleteProducts();
 
-        if (changes === 0) {
-          resolve(false);
-        }
-
         resolve(true);
       } catch (err) {
         reject(err);
@@ -258,10 +254,6 @@ class ProductController {
     return new Promise(async (resolve, reject) => {
       try {
         const changes = await this.dao.deleteProductByModel(model);
-
-        if (changes === 0) {
-          resolve(false);
-        }
 
         resolve(true);
       } catch (err) {
