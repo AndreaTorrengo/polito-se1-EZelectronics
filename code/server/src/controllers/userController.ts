@@ -67,6 +67,22 @@ class UserController {
             else reject(new UserNotAdminError)
         });
     }
+    /**
+     * Same function as the previous one, but does not require any User object.
+     * Used inside the middleware in userRoutes to check whether a username has already been used (for sign in)
+     * @param username - The username of the user to retrieve
+     * @returns A Promise that resolves to true if the provided username exists
+     */
+    async usernameAlreadyInUse(username: string) /**:Promise<Boolean> */ {
+        return new Promise<Boolean>(async (resolve, reject) => {
+            try {
+                await this.dao.getUserByUsername(username);
+                resolve(true);
+            } catch(error) {
+                resolve(false);
+            }
+        });
+    }
 
     /**
      * Deletes a specific user
