@@ -71,6 +71,7 @@ class CartRoutes {
             "/",
             this.authenticator.isCustomer,
             body("model").isString().notEmpty(),
+            this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => this.controller.addToCart(req.user, req.body.model)
                 .then(() => res.status(200).end())
                 .catch((err) => {
@@ -86,6 +87,7 @@ class CartRoutes {
          */
         this.router.patch(
             "/",
+            this.authenticator.isCustomer,
             (req: any, res: any, next: any) => this.controller.checkoutCart(req.user)
                 .then(() => res.status(200).end())
                 .catch((err) => {
@@ -114,6 +116,7 @@ class CartRoutes {
          */
         this.router.delete(
             "/products/:model",
+            this.authenticator.isCustomer,
             (req: any, res: any, next: any) => this.controller.removeProductFromCart(req.user, req.params.model)
                 .then(() => res.status(200).end())
                 .catch((err) => {
@@ -129,6 +132,7 @@ class CartRoutes {
          */
         this.router.delete(
             "/current",
+            this.authenticator.isCustomer,
             (req: any, res: any, next: any) => this.controller.clearCart(req.user)
                 .then(() => res.status(200).end())
                 .catch((err) => next(err))
@@ -141,6 +145,7 @@ class CartRoutes {
          */
         this.router.delete(
             "/",
+            this.authenticator.isAdminOrManager,
             (req: any, res: any, next: any) => this.controller.deleteAllCarts()
                 .then(() => res.status(200).end())
                 .catch((err: any) => next(err))
