@@ -69,6 +69,8 @@ class CartRoutes {
          */
         this.router.post(
             "/",
+            this.authenticator.isCustomer,
+            body("model").isString().notEmpty(),
             (req: any, res: any, next: any) => this.controller.addToCart(req.user, req.body.model)
                 .then(() => res.status(200).end())
                 .catch((err) => {
