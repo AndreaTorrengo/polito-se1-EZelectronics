@@ -94,6 +94,27 @@ describe("Unit tests for ReviewDAO", () => {
       await expect(result).resolves.toEqual({error: "Product not found in users's purchased products"});
       expect(mockDBGet).toHaveBeenCalled();
     });
+
+    test("Cannot add review to the product - Should return error", async () => {
+      const err = new Error("generic error");
+      // Assuming that the product has been purchased by the user
+      const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+        callback(null, [testReviewJson]);
+        return {} as Database;
+      });
+      // Assuming insertion fail
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation(function(sql, params, callback) {
+        callback.call({changes: 1}, err);  // (this.changes, err) sqlite
+        return {} as Database;
+      });
+
+      const result = reviewDAO.addProductReview(
+        testReviewJson.model, 'test-username', testReviewJson.score, testReviewJson.comment, testReviewJson.date
+      );
+      await expect(result).rejects.toThrow(err);
+      expect(mockDBGet).toHaveBeenCalled();
+      expect(mockDBRun).toHaveBeenCalled();
+    });
   });
 
   describe("deleteUserReview(model, username)", () => {
@@ -116,6 +137,18 @@ describe("Unit tests for ReviewDAO", () => {
       expect(mockDBRun).toHaveBeenCalled();
     });
 
+    test("Generic fail - Should return the thrown error", async () => {
+      const err = new Error("generic error");
+      const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+        callback(err, undefined);
+        return {} as Database;
+      });
+      
+      const result = reviewDAO.deleteUserReview(testReviewJson.model, 'test-username');
+      await expect(result).rejects.toThrow(err);
+      expect(mockDBGet).toHaveBeenCalled();
+    });
+
     test("Review not found - Should return nothing (undefined)", async () => {
       const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
         callback(null, undefined);
@@ -125,6 +158,25 @@ describe("Unit tests for ReviewDAO", () => {
       const result = reviewDAO.deleteUserReview(testReviewJson.model, 'test-username');
       await expect(result).resolves.toBeUndefined();
       expect(mockDBGet).toHaveBeenCalled();
+    });
+
+    test("Cannot delete the review - Should return thrown error", async () => {
+      const err = new Error("generic error");
+      // Assuming that the product has been purchased by the user
+      const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+        callback(null, [testReviewJson]);
+        return {} as Database;
+      });
+      // Assuming deletion fail
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation(function(sql, params, callback) {
+        callback.call({changes: 1}, err);  // (this.changes, err) sqlite
+        return {} as Database;
+      });
+      
+      const result = reviewDAO.deleteUserReview(testReviewJson.model, 'test-username');
+      await expect(result).rejects.toThrow(err);
+      expect(mockDBGet).toHaveBeenCalled();
+      expect(mockDBRun).toHaveBeenCalled();
     });
   });
 
@@ -146,6 +198,48 @@ describe("Unit tests for ReviewDAO", () => {
       expect(mockDBGet).toHaveBeenCalled();
       expect(mockDBRun).toHaveBeenCalled();
     });
+
+    test("Generic fail - Should return the thrown error", async () => {
+      const err = new Error("generic error");
+      const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+        callback(err, [testReviewJson]);
+        return {} as Database;
+      });
+      
+      const result = reviewDAO.deleteProductReviews(testReviewJson.model);
+      await expect(result).rejects.toThrow(err);
+      expect(mockDBGet).toHaveBeenCalled();
+    });
+
+    test("Product not found - Should return error", async () => {
+      const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+        callback.call(null, undefined);
+        return {} as Database;
+      });
+      
+      const result = reviewDAO.deleteProductReviews(testReviewJson.model);
+      await expect(result).resolves.toEqual({error: "Product not found"});
+      expect(mockDBGet).toHaveBeenCalled();
+    });
+
+    test("Cannot delete reviews - Should return thrown error", async () => {
+      const err = new Error("generic error");
+      // Assuming that the product has been purchased by the user
+      const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+        callback(null, [testReviewJson]);
+        return {} as Database;
+      });
+      // Assuming deletion fail
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation(function(sql, params, callback) {
+        callback.call({changes: 1}, err);  // (this.changes, err) sqlite
+        return {} as Database;
+      });
+      
+      const result = reviewDAO.deleteProductReviews(testReviewJson.model);
+      await expect(result).rejects.toThrow(err);
+      expect(mockDBGet).toHaveBeenCalled();
+      expect(mockDBRun).toHaveBeenCalled();
+    });
   });
 
   describe("deleteReviews()", () => {
@@ -159,6 +253,18 @@ describe("Unit tests for ReviewDAO", () => {
       
       const result = await reviewDAO.deleteReviews();
       expect(result).toBeUndefined();
+      expect(mockDBRun).toHaveBeenCalled();
+    });
+
+    test("Generic fail - Should return the thrown error", async () => {
+      const err = new Error("generic error");
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+        callback(err, [testReviewJson]);
+        return {} as Database;
+      });
+      
+      const result = reviewDAO.deleteReviews();
+      await expect(result).rejects.toThrow(err);
       expect(mockDBRun).toHaveBeenCalled();
     });
   });
