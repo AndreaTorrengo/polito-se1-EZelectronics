@@ -122,8 +122,8 @@ describe("Unit tests for ReviewDAO", () => {
         return {} as Database;
       });
       
-      const result = await reviewDAO.deleteUserReview(testReviewJson.model, 'test-username');
-      await expect(result).resolves.toBe("");
+      const result = reviewDAO.deleteUserReview(testReviewJson.model, 'test-username');
+      await expect(result).resolves.toBeUndefined();
       expect(mockDBGet).toHaveBeenCalled();
     });
   });
