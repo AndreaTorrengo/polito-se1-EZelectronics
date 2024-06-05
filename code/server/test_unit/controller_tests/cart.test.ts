@@ -253,4 +253,6 @@ describe("Checkout cart", () => {
     expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalled();
     expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalledWith(null, null, null);
   });
+
+  // TODO: error handling in cart controller test
 });
