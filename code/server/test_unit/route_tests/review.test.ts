@@ -12,7 +12,7 @@ import { ExistingReviewError, NoReviewProductError } from "../../src/errors/revi
 const baseURL = "/ezelectronics"
 
 
-jest.mock("../../src/controllers/userController");
+jest.mock("../../src/controllers/reviewController");
 jest.mock("../../src/routers/auth");
 
 let testCustomer = new User("customer", "customer", "customer", Role.CUSTOMER, "", "");
@@ -65,7 +65,7 @@ describe("Unit tests for ReviewRoutes", () => {
       jest.spyOn(Authenticator.prototype, "isCustomer").mockImplementation((req, res, next) => next());
       jest.spyOn(ReviewController.prototype, "addReview").mockRejectedValueOnce(new ExistingReviewError());
 
-      const response = await request(app).post(baseURL + `/reviews/test-product`).send(testReview);
+      const response = await request(app).post(baseURL + `/reviews/${testReview.model}`).send(testReview);
       expect(response.status).toBe(new ExistingReviewError().customCode);  // expected to throw error
     });
 
