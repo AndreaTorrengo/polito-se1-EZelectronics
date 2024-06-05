@@ -38,7 +38,7 @@ class ProductDAO {
    * @param model The unique model of the product.
    * @returns A Promise that resolve to a Product object.
    */
-  getProductByModel(model: String): Promise<Product | ProductNotFoundError> {
+  getProductByModel(model: String): Promise<Product> {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM PRODUCTS WHERE model = ?";
 
@@ -46,7 +46,7 @@ class ProductDAO {
         if (err) {
           reject(err);
         } else if (row === undefined) {
-          resolve(new ProductNotFoundError());
+          reject(new ProductNotFoundError());
         } else {
           resolve(mapRowsToProduct([row])[0]);
         }

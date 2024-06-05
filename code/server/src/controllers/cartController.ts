@@ -34,10 +34,6 @@ class CartController {
 
         const productToAdd = await productDAO.getProductByModel(product);
 
-        if (productToAdd instanceof ProductNotFoundError) {
-          throw new ProductNotFoundError();
-        }
-
         if (productToAdd.quantity == 0) {
           throw new EmptyProductStockError();
         }
