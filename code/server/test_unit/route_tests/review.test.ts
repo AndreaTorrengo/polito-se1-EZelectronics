@@ -19,15 +19,6 @@ let testCustomer = new User("customer", "customer", "customer", Role.CUSTOMER, "
 let testProduct = new Product(100, 'test-product', Category.APPLIANCE, null, null, 10);
 let testReview = new ProductReview("test-product", "customer", 4, "2024-05-31", "test-comment");
 
-// Create a dummy middleware that assigns req.user field to testCustomer
-/*const getDummyUserMiddleware = (req: any, res: any, next: any) => {
-  req.user = testCustomer;
-  return next();
-};
-
-beforeAll(() => {
-  app.use('*', getDummyUserMiddleware);
-});*/
 
 describe("Unit tests for ReviewRoutes", () => {
   describe("Route for adding a review for a given model", () => {
@@ -44,6 +35,7 @@ describe("Unit tests for ReviewRoutes", () => {
       jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next() );
       // We mock the 'isCustomer' method to return the next function, because we are not testing the Authenticator logic here (we assume it works correctly)
       jest.spyOn(Authenticator.prototype, "isCustomer").mockImplementation((req, res, next) => {
+        req.user = testCustomer;    // Appending the test-user inside the request object
         return next();
       })
       //We mock the ReviewController addReview method to return void, because we are not testing the ReviewController logic here (we assume it works correctly)
@@ -55,12 +47,11 @@ describe("Unit tests for ReviewRoutes", () => {
           We expect the 'addReview' function to have been called with the input parameters and to return a 200 success code
           Since we mock the dependencies and we are testing the route in isolation, we do not need to check that the review has actually been created
       */
-      const jsonReview = {model: 'test-product', user: testCustomer, score: 4, comment: 'test-comment'}
-      const response = await request(app).post(baseURL + `/reviews/${testProduct.model}`).send(jsonReview);
+      const response = await request(app).post(baseURL + `/reviews/${testProduct.model}`).send(testReview);
       expect(response.status).toBe(200);
       expect(ReviewController.prototype.addReview).toHaveBeenCalled();
       // Note: the user is undefined, because it is not read from the body request
-      expect(ReviewController.prototype.addReview).toHaveBeenCalledWith(jsonReview.model, undefined, jsonReview.score, jsonReview.comment);
+      expect(ReviewController.prototype.addReview).toHaveBeenCalledWith(testReview.model, testCustomer, testReview.score, testReview.comment);
     });
 
     test("Review already exists. Should return 409", async () => {
@@ -74,8 +65,7 @@ describe("Unit tests for ReviewRoutes", () => {
       jest.spyOn(Authenticator.prototype, "isCustomer").mockImplementation((req, res, next) => next());
       jest.spyOn(ReviewController.prototype, "addReview").mockRejectedValueOnce(new ExistingReviewError());
 
-      const jsonReview = {model: 'test-product', user: testCustomer, score: 4, comment: 'test-comment'}
-      const response = await request(app).post(baseURL + `/reviews/test-product`).send(jsonReview);
+      const response = await request(app).post(baseURL + `/reviews/test-product`).send(testReview);
       expect(response.status).toBe(new ExistingReviewError().customCode);  // expected to throw error
     });
 
@@ -84,8 +74,7 @@ describe("Unit tests for ReviewRoutes", () => {
         return res.status(401).json({ error: "Unauthorized" });
       });
 
-      const jsonReview = {model: 'test-product', user: testCustomer, score: 4, comment: 'test-comment'}
-      const response = await request(app).post(baseURL + `/reviews/test-product`).send(jsonReview);
+      const response = await request(app).post(baseURL + `/reviews/test-product`).send(testReview);
       expect(response.status).toBe(401);  // expected to throw error
     });
   });
@@ -145,14 +134,17 @@ describe("Unit tests for ReviewRoutes", () => {
       }))
       jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
       // We mock the 'isCustomer' method to return the next function, because we are not testing the Authenticator logic here (we assume it works correctly)
-      jest.spyOn(Authenticator.prototype, "isCustomer").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isCustomer").mockImplementation((req, res, next) => {
+        req.user = testCustomer;
+        next();
+      });
       // We mock the ReviewController deleteReview method to return void, because we are not testing the ReviewController logic here (we assume it works correctly)
       jest.spyOn(ReviewController.prototype, "deleteReview").mockResolvedValueOnce();
 
       const response = await request(app).delete(baseURL + `/reviews/${testProduct.model}`);
       expect(response.status).toBe(200);
       expect(ReviewController.prototype.deleteReview).toHaveBeenCalled();
-      expect(ReviewController.prototype.deleteReview).toHaveBeenCalledWith(testReview.model, undefined);  // model and userObj, which is undefined in this test
+      expect(ReviewController.prototype.deleteReview).toHaveBeenCalledWith(testReview.model, testCustomer);  // model and userObj, which is undefined in this test
     });
 
     test("No existing reviews. Should return 404", async () => {
