@@ -4,7 +4,7 @@ import { app } from "../../index"
 
 import UserController from "../../src/controllers/userController"
 import ErrorHandler from "../../src/helper"
-import { UserAlreadyExistsError } from "../../src/errors/userError"
+import { UserAlreadyExistsError, UserNotFoundError } from "../../src/errors/userError"
 import Authenticator from "../../src/routers/auth"
 import { User, Role } from "../../src/components/user"
 const baseURL = "/ezelectronics"
@@ -83,5 +83,101 @@ describe("Unit test for userRoutes", () => {
       const response = await request(app).get(baseURL + `/users/`);
       expect(response.status).toBe(401);
     });
+
+    test("No existing user. Should return 404", async () => {
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "getUsers").mockRejectedValueOnce(new UserNotFoundError());
+      
+      const response = await request(app).get(baseURL + `/users/`);
+      expect(response.status).toBe(new UserNotFoundError().customCode);
+    });
   });
+
+  describe("Route for retrieving all users with a specific role", () => {
+    test("It should return a 200 success code", async () => {
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "getUsersByRole").mockResolvedValueOnce([testCustomer]);
+      
+      const response = await request(app).get(baseURL + `/users/roles/${testCustomer.role}`);
+      expect(response.status).toBe(200);
+      expect(UserController.prototype.getUsersByRole).toHaveBeenCalled();
+    });
+
+    test("Unauthorized user. Should return 401", async () => {
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => {
+        return res.status(401).json({ error: "Unauthorized" });
+      });
+      
+      const response = await request(app).get(baseURL + `/users/roles/${testCustomer.role}`);
+      expect(response.status).toBe(401);
+    });
+
+    test("No existing user. Should return 404", async () => {
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "getUsersByRole").mockRejectedValueOnce(new UserNotFoundError());
+      
+      const response = await request(app).get(baseURL + `/users/roles/${testCustomer.role}`);
+      expect(response.status).toBe(new UserNotFoundError().customCode);
+    });
+  });
+
+  describe("Route for retrieving a single user with a specific username", () => {
+    test("Admin get user's info (It should return a 200 success code)", async () => {
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "getUserByUsername").mockResolvedValueOnce(testCustomer);
+      
+      const response = await request(app).get(baseURL + `/users/${testCustomer.username}`);
+      expect(response.status).toBe(200);
+      expect(UserController.prototype.getUserByUsername).toHaveBeenCalled();
+    });
+
+    test("Unauthorized user. Should return 401", async () => {
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+        return res.status(401).json({ error: "Unauthorized" });
+      });
+      
+      const response = await request(app).get(baseURL + `/users/${testCustomer.username}`);
+      expect(response.status).toBe(401);
+    });
+
+    test("No existing user. Should return 404", async () => {
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+        req.user = testCustomer;
+        next();
+      });
+      jest.spyOn(UserController.prototype, "getUserByUsername").mockRejectedValueOnce(new UserNotFoundError());
+      
+      const response = await request(app).get(baseURL + `/users/${testCustomer.username}`);
+      expect(response.status).toBe(new UserNotFoundError().customCode);
+    });
+  });
+
 });
