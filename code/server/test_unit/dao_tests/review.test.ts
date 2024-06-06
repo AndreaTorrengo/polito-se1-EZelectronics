@@ -3,6 +3,7 @@ import ReviewDAO from '../../src/dao/reviewDAO'
 import { Database } from 'sqlite3';
 import db from '../../src/db/db'
 import { ProductReview } from '../../src/components/review';
+import { ProductNotInCartError } from '../../src/errors/cartError';
 
 jest.mock("../../src/db/db.ts");
 
@@ -91,7 +92,7 @@ describe("Unit tests for ReviewDAO", () => {
       const result = reviewDAO.addProductReview(
         testReviewJson.model, 'test-username', testReviewJson.score, testReviewJson.comment, testReviewJson.date
       );
-      await expect(result).resolves.toEqual({error: "Product not found in users's purchased products"});
+      await expect(result).rejects.toEqual(new ProductNotInCartError());
       expect(mockDBGet).toHaveBeenCalled();
     });
 

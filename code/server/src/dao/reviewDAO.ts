@@ -1,6 +1,7 @@
 import db from "../db/db"
 
 import { ProductReview } from "../components/review";
+import { ProductNotInCartError } from "../errors/cartError";
 /**
  * A class that implements the interaction with the database for all review-related operations.
  * You are free to implement any method you need here, as long as the requirements are satisfied.
@@ -43,7 +44,7 @@ class ReviewDAO {
             if (err) {
                 reject(err);
             } else if (row === undefined) {
-                resolve({error: "Product not found in users's purchased products"});
+                reject(new ProductNotInCartError());
             } else {
                 sql = "INSERT INTO REVIEW (userID, productID, score, date, comment) VALUES (?, ?, ?, ?, ?)";
                 db.run(sql, [row.userID, row.productID, score, date, comment], function (err) {
