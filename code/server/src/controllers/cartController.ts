@@ -2,9 +2,10 @@ import { CartNotFoundError, EmptyCartError } from "../errors/cartError";
 import { User } from "../components/user";
 import CartDAO from "../dao/cartDAO";
 import { Cart, ProductInCart } from "../components/cart";
-import { ProductNotFoundError } from "../errors/productError";
+import { EmptyProductStockError, ProductNotFoundError } from "../errors/productError";
 import ProductController from "./productController";
 import { LowProductStockError } from "../errors/productError";
+import ProductDAO from "../dao/productDAO";
 
 /**
  * Represents a controller for managing shopping carts.
@@ -27,7 +28,21 @@ class CartController {
    * @returns A Promise that resolves to `true` if the product was successfully added.
    */
   async addToCart(user: User, product: string): Promise<Boolean> {
-    return this.dao.addToUserCart(user.username, product);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const productDAO = new ProductDAO();
+
+        const productToAdd = await productDAO.getProductByModel(product);
+
+        if (productToAdd.quantity == 0) {
+          throw new EmptyProductStockError();
+        }
+
+        resolve(await this.dao.addToUserCart(user.username, product));
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   /**
