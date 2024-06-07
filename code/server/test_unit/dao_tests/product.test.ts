@@ -83,6 +83,16 @@ describe("Delete product", () => {
     expect(mockDBRun).toHaveBeenCalled();
   });
 
+  test("All Products not deleted", async () => {
+    const errore= new Error("Errore prodotti");
+    jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+      callback(errore, null);
+      return {} as Database;
+    });
+
+    await expect(productDAO.deleteProducts()).rejects.toThrow(errore);
+  });
+
   test("Product correctly deleted", async () => {
     const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
       callback(null);
@@ -129,6 +139,19 @@ describe("Update product", () => {
     expect(result).toBe(true);
     expect(mockDBRun).toHaveBeenCalled();
   });
+
+  test("Product not updated", async () => {
+    const errore= new Error("Errore prodotti");
+    jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+      callback(errore, null);
+      return {} as Database;
+    });
+
+    await expect(productDAO.updateProduct(new Product(150, "prova", Category.APPLIANCE, null, null, 10),
+      "provaerrore")).rejects.toThrow(errore);
+  });
+
+
 });
 
 
@@ -169,6 +192,17 @@ describe("View product", () => {
     expect(result).toStrictEqual([new Product(mockProduct[0].sellingPrice, mockProduct[0].model, mockProduct[0].category, mockProduct[0].arrivalDate, mockProduct[0].details, mockProduct[0].quantity),
     new Product(mockProduct[1].sellingPrice, mockProduct[1].model, mockProduct[1].category, mockProduct[1].arrivalDate, mockProduct[1].details, mockProduct[1].quantity)]);
     expect(mockDBAll).toHaveBeenCalled();
+  });
+
+  test("view Products errore", async () => {
+    const errore= new Error("Errore prodotti");
+    jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
+      callback(errore, null);
+      return {} as Database;
+    });
+
+    await expect(productDAO.getProducts()).rejects.toThrow(errore);
+    
   });
 
   test("Error handling: No product found", async () => {
