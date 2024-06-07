@@ -15,15 +15,13 @@ const customer = { username: "customer", name: "customer", surname: "customer", 
 const manager = { username: "manager", name: "manager", surname: "manager", password: "manager", role: "Manager" };
 const admin = { username: "admin", name: "admin", surname: "admin", password: "admin", role: "Admin" };
 // Review data
-const product = {model: 'test-model', quantity: 3, category: Category.APPLIANCE, details: 'some details', sellingPrice: 50, arrivalDate: '2024-06-06'};
-const product2 = {model: 'test-model-2', quantity: 3, category: Category.SMARTPHONE, details: 'other details', sellingPrice: 20, arrivalDate: '2024-06-06'};
+const product = {model: 'test-model', category: "Appliance", quantity: 3, details: 'some details', sellingPrice: 50, arrivalDate: '2024-06-06'};
+const product2 = {model: 'test-model-2', category: "Smartphone", quantity: 3, details: 'other details', sellingPrice: 20, arrivalDate: '2024-06-06'};
 const review = {model: product.model, user: customer.username, score: 4, comment: 'test comment', date: '2024-06-06'};
 //Cookies for the users. We use them to keep users logged in. Creating them once and saving them in a variables outside of the tests will make cookies reusable
 let customerCookie: string;
 let adminCookie: string;
 let managerCookie: string;
-let productDAO: ProductDAO;
-let cartDAO: CartDAO;
 
 //Helper function that creates a new user in the database.
 //Can be used to create a user before the tests or in the tests
@@ -65,25 +63,32 @@ const login = async (userInfo: any) => {
 }*/
 
 const addProduct = (productData: any) => {
-  return productDAO.insertProduct(productData);
-  /*new Promise((resolve, reject) => {
+  //return productDAO.insertProduct(productData);
+  return new Promise((resolve, reject) => {
     request(app)
       .post(`${routePath}/products`)
       .set('Cookie', managerCookie)
       .send(productData)
+      // x-www-form-urlencoded upload
+      /*.send(new URLSearchParams(Object.entries({model: productData.model, 
+        category: productData.category, 
+        quantity: productData.quantity,
+        details: productData.details,
+        sellingPrice: productData.sellingPrice,
+        arrivalDate: productData.arrivalDate
+      })).toString())*/
       .then(() => resolve(undefined))
       .catch((err) => reject(err))
     //expect(response.status).toBe(200);
-  });*/
+  });
 };
 
 // Add product to cart, then checkout
-const purchaseProduct = async (username: String, productModel: string) => {
-  return cartDAO.addToUserCart(username, productModel).then(() => cartDAO.checkoutUserCart(username));
-  /*new Promise((resolve, reject) => {
+const purchaseProduct = (username: String, productModel: string) => {
+  return new Promise((resolve, reject) => {
     request(app)
       .post(`${routePath}/carts`)
-      .send(productModel)
+      .send({model: productModel})
       .set('Cookie', customerCookie)
       .then(() => {
         request(app)
@@ -91,14 +96,12 @@ const purchaseProduct = async (username: String, productModel: string) => {
         .set('Cookie', customerCookie)
         .then(() => resolve(undefined))
       }).catch((err) => reject(err));
-  });*/
+  });
 };
 
 //Before executing tests, we remove everything from our test database, create an Admin user and log in as Admin, saving the cookie in the corresponding variable
 beforeAll(async () => {
   cleanup()
-  productDAO = new ProductDAO;
-  cartDAO = new CartDAO;
 
   // admin login
   await postUser(admin);
@@ -143,7 +146,7 @@ describe("Review routes integration tests", () => {
 
       expect(response.status).toBe(new ExistingReviewError().customCode);
     });*/
-    test("Customer has not purchased the product - Should return the thrown error", async () => {
+    test("Customer has not purchased the product - Should return ProductNotInCartError", async () => {
       const err = new ProductNotInCartError();
       const response = await request(app)
       .post(`${routePath}/reviews/${product2.model}`)
