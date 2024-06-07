@@ -21,7 +21,7 @@ describe("test registrazione prodotto", ()=>{
     
     test("registrare nuovo prodotto", async()=>{
         const testProduct=new Product(89.00,"test modello", Category.LAPTOP,"2023-07-07","test descrizione",20)
-        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(new ProductNotFoundError());
+        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockRejectedValueOnce(new ProductNotFoundError());
         jest.spyOn(ProductDAO.prototype, "insertProduct").mockResolvedValueOnce(true);
         const controller=new ProductController();
         const response= await controller.registerProducts(testProduct.model, testProduct.category,testProduct.quantity, testProduct.details, testProduct.sellingPrice, testProduct.arrivalDate);
@@ -34,17 +34,17 @@ describe("test registrazione prodotto", ()=>{
     test("registrare  prodotto esistente", async()=>{
         const testProduct=new Product(89.00,"test modello", Category.LAPTOP,"2023-07-07","test descrizione",20)
         jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(testProduct);
-        jest.spyOn(ProductDAO.prototype, "insertProduct").mockResolvedValueOnce(true);
+        jest.spyOn(ProductDAO.prototype, "insertProduct").mockRejectedValueOnce(new ProductAlreadyExistsError());
         const controller=new ProductController();
         const response= controller.registerProducts(testProduct.model, testProduct.category,testProduct.quantity, testProduct.details, testProduct.sellingPrice, testProduct.arrivalDate);
         await expect(response).rejects.toThrow(new ProductAlreadyExistsError());
-        expect(ProductDAO.prototype.insertProduct).toBeCalledTimes(0);
+        expect(ProductDAO.prototype.insertProduct).toBeCalledTimes(1);
         
     });
 
     test("registrare nuovo prodotto errore data", async()=>{
         const testProduct=new Product(89.00,"test modello", Category.LAPTOP,"2073-07-07","test descrizione",20)
-        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(new ProductNotFoundError());
+        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockRejectedValueOnce(new ProductNotFoundError());
         jest.spyOn(ProductDAO.prototype, "insertProduct").mockResolvedValueOnce(true);
         const controller=new ProductController();
         const response= controller.registerProducts(testProduct.model, testProduct.category,testProduct.quantity, testProduct.details, testProduct.sellingPrice, testProduct.arrivalDate);
@@ -85,7 +85,7 @@ describe("cambio quantita", ()=>{
         const testModel= "test modello1";
         const newProductTest=new Product(89.00,"test modello", Category.LAPTOP,"2023-08-08","test descrizione",testNewQuantity+testProduct.quantity);
 
-        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(new ProductNotFoundError);
+        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockRejectedValueOnce(new ProductNotFoundError);
         jest.spyOn(ProductDAO.prototype, "updateProduct").mockResolvedValueOnce(true);
         const controller=new ProductController();
         const response = controller.changeProductQuantity(testModel,testNewQuantity,"2023-08-08");
@@ -142,7 +142,7 @@ describe("vendita prodotti", ()=>{
         const testQuantitySale=5;
         const testModel= "test modello";
         const newProductTest=new Product(89.00,"test modello", Category.LAPTOP,"2023-07-07","test descrizione",testProduct.quantity-testQuantitySale);
-        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(new ProductNotFoundError());
+        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockRejectedValueOnce(new ProductNotFoundError());
         jest.spyOn(ProductDAO.prototype, "updateProduct").mockResolvedValueOnce(true);
         const controller=new ProductController();
         const response = controller.sellProduct(testModel,testQuantitySale,"2023-08-08");
