@@ -1,7 +1,11 @@
-import { UserNotAdminError, UnauthorizedUserError } from "../errors/userError"
+import { UserNotAdminError, UnauthorizedUserError, UserNotFoundError } from "../errors/userError"
 import { User } from "../components/user"
 import UserDAO from "../dao/userDAO"
-import { Utility } from "../utilities"
+import { DateError, Utility } from "../utilities"
+
+const now = (): string => {
+    return new Date().toISOString().split("T")[0];
+};
 
 /**
  * Represents a controller for managing users.
@@ -106,7 +110,16 @@ class UserController {
      * @returns A Promise that resolves to true if all non-Admin users have been deleted.
      */
     async deleteAll() {
-        return this.dao.deleteAll();
+        //return this.dao.deleteAll();
+        
+        return new Promise<Boolean>((resolve, reject) => {
+            if (this.dao.deleteAll()){
+                resolve(true);
+            } else {
+                reject(new UserNotFoundError);
+            };
+        });
+        
     }
 
     /**
@@ -122,8 +135,12 @@ class UserController {
      */
     async updateUserInfo(user: User, name: string, surname: string, address: string, birthdate: string, username: string) /**:Promise<User> */ {
         return new Promise<User>((resolve, reject) => {
-            if(Utility.isAdmin(user) || user.username == username)     // todo: I should implement this checks in userRoutes.ts and not inside this controller
+            if(Utility.isAdmin(user) || user.username == username) {    // todo: I should implement this checks in userRoutes.ts and not inside this controller
+                if(birthdate > now()) {
+                    reject(new DateError);
+                }
                 resolve(this.dao.updateUserInfo(user, name, surname, address, birthdate, username));
+            }
             else reject(new UnauthorizedUserError);
         });
     }
