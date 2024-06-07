@@ -81,23 +81,18 @@ class CartController {
         const productController = new ProductController();
         const cart = await this.getCart(user);
 
-        productController
-          .getAvailableProducts(null, null, null)
-          .then((availableProducts) => {
-            cart.products.forEach((product) => {
-              let p = availableProducts.find(
-                (availableProduct) =>
-                  product.model === availableProduct.model && product.quantity <= availableProduct.quantity
-              );
+        const availableProducts = await productController.getAvailableProducts(null, null, null);
 
-              if (p === undefined) {
-                throw new LowProductStockError();
-              }
-            });
-          })
-          .catch((err) => {
-            throw err;
-          });
+        cart.products.forEach((product) => {
+          let p = availableProducts.find(
+            (availableProduct) =>
+              product.model === availableProduct.model && product.quantity <= availableProduct.quantity
+          );
+
+          if (p === undefined) {
+            throw new LowProductStockError();
+          }
+        });
 
         const changes = await this.dao.checkoutUserCart(user.username);
 

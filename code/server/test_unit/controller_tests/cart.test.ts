@@ -25,8 +25,11 @@ let testProduct = new Product(100, "test-product", Category.APPLIANCE, null, nul
 let testCart = new Cart(testCustomer.username, false, "", 200, [
   new ProductInCart(testProduct.model, 2, Category.APPLIANCE, 100),
 ]);
+let testCartError = new Cart(testCustomer.username, false, "", 200, [
+  new ProductInCart(testProduct.model, 20, Category.APPLIANCE, 100),
+]);
 let testPaidCart = new Cart(testCustomer.username, true, "2024-01-01", 200, [
-  new ProductInCart(testProduct.model, 2, Category.APPLIANCE, 100),
+  new ProductInCart(testProduct.model, 10, Category.APPLIANCE, 100),
 ]);
 let testCartArray = [testPaidCart, testPaidCart];
 
@@ -104,6 +107,19 @@ describe("Get current cart, cartHistory and get all carts", () => {
     expect(CartDAO.prototype.getDummyCart).toHaveBeenCalledWith(testCustomer.username);
   });
 
+  test("Get current cart, DB fails. Should reject with DB ERROR", async () => {
+    const error = new Error("DB ERROR");
+
+    jest.spyOn(CartDAO.prototype, "getUserCurrentCart").mockRejectedValueOnce(error);
+
+    const controller = new CartController();
+
+    const result = controller.getCart(testCustomer);
+    await expect(result).rejects.toStrictEqual(error);
+    expect(CartDAO.prototype.getUserCurrentCart).toHaveBeenCalled();
+    expect(CartDAO.prototype.getUserCurrentCart).toHaveBeenCalledWith(testCustomer.username);
+  });
+
   test("Get cart history", async () => {
     jest.spyOn(CartDAO.prototype, "getUserCarts").mockResolvedValueOnce(testCartArray);
 
@@ -111,6 +127,19 @@ describe("Get current cart, cartHistory and get all carts", () => {
 
     const result = controller.getCustomerCarts(testCustomer);
     await expect(result).resolves.toStrictEqual(testCartArray.filter((c) => c.paid));
+    expect(CartDAO.prototype.getUserCarts).toHaveBeenCalled();
+    expect(CartDAO.prototype.getUserCarts).toHaveBeenCalledWith(testCustomer.username);
+  });
+
+  test("Get cart history, DB fails. Should reject with DB ERROR", async () => {
+    const error = new Error("DB ERROR");
+
+    jest.spyOn(CartDAO.prototype, "getUserCarts").mockRejectedValueOnce(error);
+
+    const controller = new CartController();
+
+    const result = controller.getCustomerCarts(testCustomer);
+    await expect(result).rejects.toStrictEqual(error);
     expect(CartDAO.prototype.getUserCarts).toHaveBeenCalled();
     expect(CartDAO.prototype.getUserCarts).toHaveBeenCalledWith(testCustomer.username);
   });
@@ -192,13 +221,31 @@ describe("Remove product from cart", () => {
 
 describe("Remove all the product from the current cart", () => {
   test("All products removes correctly", async () => {
-    jest.spyOn(CartDAO.prototype, "getCurrentCartId").mockResolvedValue(1);
+    jest.spyOn(CartDAO.prototype, "getCurrentCartId").mockResolvedValueOnce(1);
     jest.spyOn(CartDAO.prototype, "deleteUserCart").mockResolvedValueOnce(true);
 
     const controller = new CartController();
 
     const result = controller.clearCart(testCustomer);
     await expect(result).resolves.toStrictEqual(true);
+    expect(CartDAO.prototype.getCurrentCartId).toHaveBeenCalled();
+    expect(CartDAO.prototype.getCurrentCartId).toHaveBeenCalledWith(testCustomer.username);
+    expect(CartDAO.prototype.deleteUserCart).toHaveBeenCalled();
+    expect(CartDAO.prototype.deleteUserCart).toHaveBeenCalledWith(1);
+  });
+
+  test("Clear cart, DB fails. Should reject with DB ERROR", async () => {
+    const error = new Error("DB ERROR");
+
+    jest.spyOn(CartDAO.prototype, "getCurrentCartId").mockResolvedValueOnce(1);
+    jest.spyOn(CartDAO.prototype, "deleteUserCart").mockRejectedValueOnce(error);
+
+    const controller = new CartController();
+
+    const result = controller.clearCart(testCustomer);
+    await expect(result).rejects.toStrictEqual(error);
+    expect(CartDAO.prototype.getCurrentCartId).toHaveBeenCalled();
+    expect(CartDAO.prototype.getCurrentCartId).toHaveBeenCalledWith(testCustomer.username);
     expect(CartDAO.prototype.deleteUserCart).toHaveBeenCalled();
     expect(CartDAO.prototype.deleteUserCart).toHaveBeenCalledWith(1);
   });
@@ -254,5 +301,49 @@ describe("Checkout cart", () => {
     expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalledWith(null, null, null);
   });
 
-  // TODO: error handling in cart controller test
+  test("Product in cart could not respond with the quantity requested. Should reject with LowProductStockError", async () => {
+    const error = new LowProductStockError();
+
+    jest.spyOn(CartController.prototype, "getCart").mockResolvedValueOnce(testCartError);
+    jest.spyOn(ProductController.prototype, "getAvailableProducts").mockResolvedValueOnce([testProduct]);
+
+    const controller = new CartController();
+
+    const result = controller.checkoutCart(testCustomer);
+    await expect(result).rejects.toStrictEqual(error);
+    expect(CartController.prototype.getCart).toHaveBeenCalled();
+    expect(CartController.prototype.getCart).toHaveBeenCalledWith(testCustomer);
+    expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalled();
+    expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalledWith(null, null, null);
+  });
+
+  test("Checkout user cart fail. Should resolve with false", async () => {
+    jest.spyOn(CartController.prototype, "getCart").mockResolvedValueOnce(testCart);
+    jest.spyOn(CartDAO.prototype, "checkoutUserCart").mockResolvedValueOnce(0);
+    jest.spyOn(ProductController.prototype, "getAvailableProducts").mockResolvedValueOnce([testProduct]);
+
+    const controller = new CartController();
+
+    const result = controller.checkoutCart(testCustomer);
+    await expect(result).resolves.toStrictEqual(false);
+    expect(CartController.prototype.getCart).toHaveBeenCalled();
+    expect(CartController.prototype.getCart).toHaveBeenCalledWith(testCustomer);
+    expect(CartDAO.prototype.checkoutUserCart).toHaveBeenCalled();
+    expect(CartDAO.prototype.checkoutUserCart).toHaveBeenCalledWith(testCustomer.username);
+    expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalled();
+    expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalledWith(null, null, null);
+  });
+
+  test("Checkout user cart, DB fails. Should reject with DB ERROR", async () => {
+    const error = new Error("DB ERROR");
+
+    jest.spyOn(CartController.prototype, "getCart").mockRejectedValueOnce(error);
+
+    const controller = new CartController();
+
+    const result = controller.checkoutCart(testCustomer);
+    await expect(result).rejects.toStrictEqual(error);
+    expect(CartController.prototype.getCart).toHaveBeenCalled();
+    expect(CartController.prototype.getCart).toHaveBeenCalledWith(testCustomer);
+  });
 });
