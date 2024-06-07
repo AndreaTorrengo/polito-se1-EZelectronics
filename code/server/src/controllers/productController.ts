@@ -43,12 +43,10 @@ class ProductController {
   ): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
-        let product;
         try {
-          product = await this.dao.getProductByModel(model);
-        } catch(err) {
-          if(!(err instanceof ProductNotFoundError))
-            throw err;
+          await this.dao.getProductByModel(model);
+        } catch (err) {
+          if (!(err instanceof ProductNotFoundError)) throw err;
         }
 
         const date = arrivalDate ? arrivalDate : now();
