@@ -53,6 +53,17 @@ describe("test registrazione prodotto", ()=>{
          
     });
     
+    test("registrare nuovo prodotto errore", async()=>{
+        const testProduct=new Product(89.00,"test modello", Category.LAPTOP,"2023-07-07","test descrizione",20)
+        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockRejectedValueOnce(new Error("errore registrazione"));
+        jest.spyOn(ProductDAO.prototype, "insertProduct").mockResolvedValueOnce(true);
+        const controller=new ProductController();
+        const response= controller.registerProducts(testProduct.model, testProduct.category,testProduct.quantity, testProduct.details, testProduct.sellingPrice, testProduct.arrivalDate);
+        await expect(response).rejects.toStrictEqual(new Error("errore registrazione"));
+        expect(ProductDAO.prototype.insertProduct).toBeCalledTimes(0);
+        
+    });
+
 
 
     
@@ -217,6 +228,17 @@ describe("cancella un prodotto", ()=>{
 
     });
 
+    test("DeleteProduct erroe", async ()=>{
+        const testModel= "test modello";
+        jest.spyOn(ProductDAO.prototype, "deleteProductByModel").mockRejectedValueOnce(new Error("errore delete model"));
+        const controller=new ProductController();
+        const response =  controller.deleteProduct(testModel);
+        await expect(response).rejects.toStrictEqual(new Error("errore delete model"));
+        expect(ProductDAO.prototype.deleteProductByModel).toBeCalledTimes(1);
+           
+
+    });
+
     afterEach(() => {
         jest.clearAllMocks();
         jest.restoreAllMocks();
@@ -236,6 +258,17 @@ describe("cancella tutti prodotti", ()=>{
         expect(ProductDAO.prototype.deleteProducts).toBeCalledTimes(1);
         expect(ProductDAO.prototype.deleteProducts).toBeCalledWith(); 
         expect(response).toBe(true);   
+
+    });
+
+    test("DeleteAllProduct errore", async ()=>{
+
+        jest.spyOn(ProductDAO.prototype, "deleteProducts").mockRejectedValueOnce(new Error("errore"));
+        const controller=new ProductController();
+        const response = controller.deleteAllProducts();
+        await expect(response).rejects.toStrictEqual(new Error("errore"));   
+        expect(ProductDAO.prototype.deleteProducts).toBeCalledTimes(1);
+        
 
     });
 
@@ -307,17 +340,17 @@ describe("getProdottiDisponibili",()=>{
         expect(ProductDAO.prototype.getProducts).toBeCalledTimes(1);
         expect(response).toEqual([new Product(testProduct[0].sellingPrice, testProduct[0].model, testProduct[0].category, testProduct[0].arrivalDate, testProduct[0].details, testProduct[0].quantity)]);
     });
-/*
-    test("getProductsAvailablebyModel quantity=0", async ()=>{
+
+    test("getProductsAvailablebyModel errore funzione", async ()=>{
         const testProduct=[{ sellingPrice: 55.00, model: "provagetproductgroupingmodel", category: Category.LAPTOP, arrivalDate: "", details: "provagrouping", quantity: 0 }];
         const testgrouping="model";
         jest.spyOn(ProductDAO.prototype, "getProducts").mockRejectedValueOnce(testProduct);
         const controller=new ProductController();
         const response= controller.getAvailableProducts(testgrouping," ","provagetproductgroupingmodel");
-        await expect(response).rejects.toThrow(new Error("no product available"));
+        await expect(response).rejects.toStrictEqual(testProduct);
         expect(ProductDAO.prototype.getProducts).toBeCalledTimes(1); 
     
-    });*/
+    });
 
 
     afterEach(() => {
