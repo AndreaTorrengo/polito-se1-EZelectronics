@@ -83,7 +83,11 @@ class UserController {
                 await this.dao.getUserByUsername(username);
                 resolve(true);
             } catch(error) {
-                resolve(false);
+                if (error == UserNotFoundError){
+                    resolve(false);
+                } else {
+                    reject(error);
+                }
             }
         });
     }
@@ -112,12 +116,16 @@ class UserController {
     async deleteAll() {
         //return this.dao.deleteAll();
         
-        return new Promise<Boolean>((resolve, reject) => {
-            if (this.dao.deleteAll()){
-                resolve(true);
-            } else {
-                reject(new UserNotFoundError);
-            };
+        return new Promise<Boolean>(async (resolve, reject) => {
+            try {
+                if (await this.dao.deleteAll()){
+                    resolve(true);
+                } else {
+                    reject(new UserNotFoundError);
+                };
+            } catch (error) {
+                reject(error);
+            }
         });
         
     }
