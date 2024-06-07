@@ -5,11 +5,7 @@ import {
 import { User } from "../components/user";
 import ReviewDAO from "../dao/reviewDAO";
 import { ProductReview } from "../components/review";
-
-function getCurrentDate(): string {
-  const currentDate = new Date();
-  return currentDate.toISOString().slice(0, 10);
-}
+import { Utility } from "../utilities";
 
 class ReviewController {
   private dao: ReviewDAO;
@@ -39,7 +35,7 @@ class ReviewController {
           user.username,
           score,
           comment,
-          getCurrentDate()
+          Utility.now(),
         );
 
         if (changes === 0) {
