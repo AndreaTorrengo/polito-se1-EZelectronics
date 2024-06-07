@@ -59,7 +59,7 @@ class ProductController {
 
         const changes = await this.dao.insertProduct(newProduct);
 
-        resolve();
+        resolve(null);
       } catch (err) {
         reject(err);
       }

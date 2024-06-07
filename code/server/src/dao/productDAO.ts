@@ -7,9 +7,9 @@ import db from "../db/db";
 import { Product } from "../components/product";
 import { ProductNotFoundError } from "../errors/productError";
 
-function mapRowsToProduct(rows: any[]): Product[] {
+function mapRowsToProduct(rows: any): Product[] {
   return rows.map(
-    (row) =>
+    (row:any) =>
       new Product(row.sellingPrice, row.model, row.category, row.arrivalDate, row.details, row.quantity)
   );
 }
