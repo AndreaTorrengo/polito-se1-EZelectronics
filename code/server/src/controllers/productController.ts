@@ -43,10 +43,12 @@ class ProductController {
   ): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
-        const product = await this.dao.getProductByModel(model);
-
-        if (product instanceof Product) {
-          throw new ProductAlreadyExistsError();
+        let product;
+        try {
+          product = await this.dao.getProductByModel(model);
+        } catch(err) {
+          if(!(err instanceof ProductNotFoundError))
+            throw err;
         }
 
         const date = arrivalDate ? arrivalDate : now();
@@ -59,7 +61,7 @@ class ProductController {
 
         const changes = await this.dao.insertProduct(newProduct);
 
-        resolve();
+        resolve(null);
       } catch (err) {
         reject(err);
       }
