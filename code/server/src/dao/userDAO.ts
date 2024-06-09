@@ -174,7 +174,7 @@ class UserDAO {
         return new Promise<Boolean>((resolve, reject) => {
             try {
                 const sql = "DELETE FROM users WHERE role != 'Admin'";
-                db.run(sql, function(err) {
+                db.run(sql, [], function(err) {
                     if(err) {
                         reject(err);
                         return;

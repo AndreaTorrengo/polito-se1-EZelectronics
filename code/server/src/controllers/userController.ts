@@ -79,7 +79,7 @@ class UserController {
                 await this.dao.getUserByUsername(username);
                 resolve(true);
             } catch(error) {
-                if (error == UserNotFoundError){
+                if (error instanceof UserNotFoundError){
                     resolve(false);
                 } else {
                     reject(error);
