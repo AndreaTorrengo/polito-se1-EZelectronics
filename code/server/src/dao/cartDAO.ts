@@ -11,13 +11,7 @@ const mapRowsToCart = (cartRows: any, productRows: any): Cart[] => {
   const carts: Cart[] = [];
 
   cartRows.forEach((cartRow: any) => {
-    let currentCart = new Cart(
-      cartRow.username,
-      cartRow.paid,
-      cartRow.paymentDate,
-      0,
-      []
-    );
+    let currentCart = new Cart(cartRow.username, cartRow.paid, cartRow.paymentDate, 0, []);
 
     productRows.forEach((productRow: any) => {
       if (productRow.cartID === cartRow.cartID) {
@@ -110,13 +104,13 @@ class CartDAO {
       try {
         const userCarts = await this.getUserCarts(username);
         // May be a user who has not purchased anything yet and with empty cart
-        if(!userCarts.length) {
+        if (!userCarts.length) {
           resolve(undefined);
           return;
         }
-        const currentCart = userCarts.find(row => !row.paid);   // find() returns undefined if there is no match
+        const currentCart = userCarts.find((row) => !row.paid); // find() returns undefined if there is no match
         resolve(currentCart);
-      } catch(error) {
+      } catch (error) {
         reject(error);
       }
     });
@@ -128,7 +122,6 @@ class CartDAO {
   getDummyCart(username: string): Cart {
     return new Cart(username, false, null, 0, []);
   }
-
 
   getCurrentCartId(username: String): Promise<Number | undefined> {
     return new Promise((resolve, reject) => {
@@ -148,8 +141,7 @@ class CartDAO {
 
   insertNewProductInCart(cartId: Number, productId: Number, quantity: Number): Promise<Boolean> {
     return new Promise((resolve, reject) => {
-      const sql =
-        "INSERT INTO cartProducts (cartID, productID, quantity) VALUES (?,?,?)";
+      const sql = "INSERT INTO cartProducts (cartID, productID, quantity) VALUES (?,?,?)";
       db.run(sql, [cartId, productId, quantity], function (err) {
         if (err) {
           reject(err);
@@ -288,10 +280,10 @@ class CartDAO {
     return new Promise<Number>((resolve, reject) => {
       const sql = "UPDATE cartProducts SET quantity = ? WHERE cartID=? AND productID=?";
       db.run(sql, [updatedQuantity, cartID, productId], function (err) {
-        if(err){
+        if (err) {
           reject(err);
           return;
-        } 
+        }
         resolve(this.changes);
       });
     });
@@ -305,10 +297,10 @@ class CartDAO {
     return new Promise<Number>((resolve, reject) => {
       const sql = "DELETE FROM cartProducts WHERE cartID=? AND productID=?";
       db.run(sql, [cartID, productId], function (err) {
-        if(err){
+        if (err) {
           reject(err);
           return;
-        } 
+        }
         resolve(this.changes);
       });
     });
@@ -322,43 +314,43 @@ class CartDAO {
    * @param delta Increment to the quantity (such as 1 or -1)
    * @returns A Promise that resolves to `true` if the quantity has been successfully updated
    */
-  editProductInCartQuantity(cartID: Number, username: String, model: String, delta: number): Promise<boolean> {
+  editProductInCartQuantity(
+    cartID: Number,
+    username: String,
+    model: String,
+    delta: number
+  ): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const productId = await this.getProductIdFromModel(model);
         // Get the user current cart Row (not paid yet). Format: {username, paid, paymentDate, total, products: [{model, quantity, category, price}, {productInCart_2}, {productInCart_3}, ...]}
         const cartRow = await this.getUserCurrentCart(username);
-        let updatedQuantity;  // default value will be 1 for adding a new product to the cart
+        let updatedQuantity; // default value will be 1 for adding a new product to the cart
         let productInCart;
 
-        if(cartRow) {
-          productInCart = cartRow.products.find(prod => prod.model === model);  // Extract the product object inside the cart
+        console.log(cartRow);
+
+        if (cartRow) {
+          productInCart = cartRow.products.find((prod) => prod.model === model); // Extract the product object inside the cart
           // Compute the updated quantity of the product (if already is in the cart)
           updatedQuantity = productInCart ? productInCart.quantity + delta : 1;
         } else {
           //reject(new CartNotFoundError());
         }
-        
+
         // If the cart does not exists, then insert a new one on the database, and insert the cartProduct record
-        if(!cartID)
-          await this.createNewCart(username, productId);
+        if (!cartID) await this.createNewCart(username, productId);
         // If cartProduct record doesn't exists on the database, create a new one
-        else if(!productInCart)
-          await this.insertNewProductInCart(cartID, productId, updatedQuantity);
+        else if (!productInCart) await this.insertNewProductInCart(cartID, productId, updatedQuantity);
         // if the quantity of the product to remove on the cart is > 0, then update cartProducts record
-        else if(Number(updatedQuantity) > 0)
+        else if (Number(updatedQuantity) > 0)
           await this.updateCartProductRecord(cartID, productId, updatedQuantity);
-        else{
+        else {
           await this.deleteCartProductRecord(cartID, productId);
-          
-          // If the cart remains empty, delete the whole cart
-          const currentCart = await this.getUserCurrentCart(username);
-          if(currentCart && currentCart.products.length == 0)
-            await this.deleteUserCart(cartID);
         }
 
         resolve(true);
-      } catch(error) {
+      } catch (error) {
         reject(error);
       }
     });
@@ -373,18 +365,23 @@ class CartDAO {
   removeProductFromCart(username: String, product: String): Promise<Boolean> {
     return new Promise<Boolean>(async (resolve, reject) => {
       try {
-        const cartID = (await this.getCurrentCartId(username));
+        const cartID = await this.getCurrentCartId(username);
 
         // Check whether the cart exists
-        if(!cartID) {
-          reject(new CartNotFoundError());
-          return;
+        if (!cartID) {
+          throw new CartNotFoundError();
         }
-        
+
+        const cart = await this.getUserCurrentCart(username);
+
+        if (cart.products.length === 0) {
+          throw new EmptyCartError();
+        }
+
         const result = await this.editProductInCartQuantity(cartID, username, product, -1);
         resolve(result);
       } catch (error) {
-        reject(false);
+        reject(error);
       }
     });
   }

@@ -79,25 +79,29 @@ class CartController {
     return new Promise(async (resolve, reject) => {
       try {
         const productController = new ProductController();
-        const cart = await this.getCart(user);
+        const cart = await this.dao.getUserCurrentCart(user.username);
+        console.log(cart);
 
-        productController
-          .getAvailableProducts(null, null, null)
-          .then((availableProducts) => {
-            cart.products.forEach((product) => {
-              let p = availableProducts.find(
-                (availableProduct) =>
-                  product.model === availableProduct.model && product.quantity <= availableProduct.quantity
-              );
+        if (cart === undefined) {
+          throw new CartNotFoundError();
+        }
 
-              if (p === undefined) {
-                throw new LowProductStockError();
-              }
-            });
-          })
-          .catch((err) => {
-            throw err;
-          });
+        if (cart.products.length === 0) {
+          throw new EmptyCartError();
+        }
+
+        const availableProducts = await productController.getAvailableProducts(null, null, null);
+
+        cart.products.forEach((product) => {
+          let p = availableProducts.find(
+            (availableProduct) =>
+              product.model === availableProduct.model && product.quantity <= availableProduct.quantity
+          );
+
+          if (p === undefined) {
+            throw new LowProductStockError();
+          }
+        });
 
         const changes = await this.dao.checkoutUserCart(user.username);
 

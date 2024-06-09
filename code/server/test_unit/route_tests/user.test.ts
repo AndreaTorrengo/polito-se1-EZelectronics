@@ -4,7 +4,7 @@ import { app } from "../../index"
 
 import UserController from "../../src/controllers/userController"
 import ErrorHandler from "../../src/helper"
-import { UserAlreadyExistsError, UserNotFoundError } from "../../src/errors/userError"
+import { UnauthorizedUserError, UserAlreadyExistsError, UserNotFoundError } from "../../src/errors/userError"
 import Authenticator from "../../src/routers/auth"
 import { User, Role } from "../../src/components/user"
 const baseURL = "/ezelectronics"
@@ -59,7 +59,7 @@ describe("Unit test for userRoutes", () => {
       jest.spyOn(UserController.prototype, "createUser").mockRejectedValueOnce(new UserAlreadyExistsError());
 
       const response = await request(app).post(baseURL + "/users").send(testUser);
-      expect(response.status).toBe(new UserAlreadyExistsError().customCode)   // Expect to throw 409 error
+      expect(response.status).toBe(409)   // Expect to throw 409 error
     });
   });
 
@@ -169,10 +169,7 @@ describe("Unit test for userRoutes", () => {
       }));
 
       jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
-      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-        req.user = testCustomer;
-        next();
-      });
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
       jest.spyOn(UserController.prototype, "getUserByUsername").mockRejectedValueOnce(new UserNotFoundError());
       
       const response = await request(app).get(baseURL + `/users/${testCustomer.username}`);
@@ -180,4 +177,156 @@ describe("Unit test for userRoutes", () => {
     });
   });
 
+  describe("Route for deleting a user", () => {
+    test("DELETE users/:username", async () => {
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "deleteUser").mockResolvedValueOnce(true);
+      
+      const response = await request(app).delete(baseURL + `/users/${testCustomer.username}`);
+      expect(response.status).toBe(200);
+      expect(UserController.prototype.deleteUser).toHaveBeenCalled();
+    });
+    
+    test("Unauthorized user. Should return 401", async () => {
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+        return res.status(401).json({ error: "Unauthorized" });
+      });
+      
+      const response = await request(app).delete(baseURL + `/users/${testCustomer.username}`);
+      expect(response.status).toBe(401);
+    });
+
+    test("No existing user. Should return 404", async () => {
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "deleteUser").mockRejectedValueOnce(new UserNotFoundError());
+      
+      const response = await request(app).delete(baseURL + `/users/${testCustomer.username}`);
+      expect(response.status).toBe(404);
+    });
+    
+  });
+
+  describe("Route for deleting all users", () => {
+    test("DELETE users/:username", async () => {
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "deleteAll").mockResolvedValueOnce(true);
+      
+      const response = await request(app).delete(baseURL + `/users/`);
+      expect(response.status).toBe(200);
+      expect(UserController.prototype.deleteAll).toHaveBeenCalled();
+    });
+    
+    test("Unauthorized user. Should return 401", async () => {
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => {
+        return res.status(401).json({ error: "Unauthorized" });
+      });
+      
+      const response = await request(app).delete(baseURL + `/users/`);
+      expect(response.status).toBe(401);
+    });
+    
+    test("No existing user", async () => {
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "deleteAll").mockRejectedValueOnce(new UserNotFoundError());
+      
+      const response = await request(app).delete(baseURL + `/users/`);
+      expect(response.status).toBe(404);
+    });
+    
+  });
+
+  describe("Route for updating the information of a user", () => {
+    test("PATCH users/:username", async () => {
+      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "01/01/1970" };
+      const testModifiedUser = new User(testCustomer.username, testUser.name, testUser.surname, testCustomer.role, testUser.address, testUser.birthdate);
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+        req.user = testCustomer;
+        next();
+      });
+      jest.spyOn(UserController.prototype, "updateUserInfo").mockResolvedValueOnce(testModifiedUser);
+      
+      const response = await request(app).patch(baseURL + `/users/${testCustomer.username}`).send(testUser);
+      expect(response.status).toBe(200);
+      expect(UserController.prototype.updateUserInfo).toHaveBeenCalledTimes(1);
+      expect(UserController.prototype.updateUserInfo).toHaveBeenCalledWith(
+        testCustomer,
+        testUser.name,
+        testUser.surname,
+        testUser.address,
+        testUser.birthdate,
+        testCustomer.username,
+      )
+    });
+
+    test("Unauthorized user. Should return 401", async () => {
+      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "01/01/1970" };
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "updateUserInfo").mockRejectedValueOnce(new UnauthorizedUserError());
+      
+      const response = await request(app).patch(baseURL + `/users/${testCustomer.username}`).send(testUser);
+      expect(response.status).toBe(401);
+    });
+    
+    test("No existing user", async () => {
+      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "01/01/1970" };
+      jest.mock('express-validator', () => ({
+        param: jest.fn().mockImplementation(() => ({
+          isString: () => ({ isLength: () => ({}) }),
+          isIn: () => ({ isLength: () => ({}) }),
+        })),
+      }));
+
+      jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
+      jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => next());
+      jest.spyOn(UserController.prototype, "updateUserInfo").mockRejectedValueOnce(new UserNotFoundError());
+      
+      const response = await request(app).patch(baseURL + `/users/${testCustomer.username}`).send(testUser);
+      expect(response.status).toBe(404);
+    });
+    
+  });
+    
 });

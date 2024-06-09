@@ -6,11 +6,7 @@ import {
   ProductAlreadyExistsError,
   ProductNotFoundError,
 } from "../errors/productError";
-import { DateError } from "../utilities";
-
-const now = (): string => {
-  return new Date().toISOString().split("T")[0];
-};
+import { DateError, Utility } from "../utilities";
 
 /**
  * Represents a controller for managing products.
@@ -43,17 +39,15 @@ class ProductController {
   ): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
-        let product;
         try {
-          product = await this.dao.getProductByModel(model);
-        } catch(err) {
-          if(!(err instanceof ProductNotFoundError))
-            throw err;
+          await this.dao.getProductByModel(model);
+        } catch (err) {
+          if (!(err instanceof ProductNotFoundError)) throw err;
         }
 
-        const date = arrivalDate ? arrivalDate : now();
+        const date = arrivalDate ? arrivalDate : Utility.now();
 
-        if (date > now()) {
+        if (date > Utility.now()) {
           throw new DateError();
         }
 
@@ -61,7 +55,7 @@ class ProductController {
 
         const changes = await this.dao.insertProduct(newProduct);
 
-        resolve();
+        resolve(null);
       } catch (err) {
         reject(err);
       }
@@ -84,9 +78,9 @@ class ProductController {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
 
-        const date = changeDate ? changeDate : now();
+        const date = changeDate ? changeDate : Utility.now();
 
-        if (date > now() || date < oldProduct.arrivalDate) {
+        if (date > Utility.now() || date < oldProduct.arrivalDate) {
           throw new DateError();
         }
 
@@ -130,9 +124,9 @@ class ProductController {
           throw new LowProductStockError();
         }
 
-        const date = sellingDate ? sellingDate : now();
+        const date = sellingDate ? sellingDate : Utility.now();
 
-        if (date > now() || date < oldProduct.arrivalDate) {
+        if (date > Utility.now() || date < oldProduct.arrivalDate) {
           throw new DateError();
         }
 

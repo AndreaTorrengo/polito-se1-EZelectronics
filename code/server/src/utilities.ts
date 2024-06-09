@@ -44,6 +44,10 @@ class Utility {
         }
     }
 
+    static now(): string {
+        return new Date().toISOString().split("T")[0];
+    };
+
 }
 
 class DateError extends Error {

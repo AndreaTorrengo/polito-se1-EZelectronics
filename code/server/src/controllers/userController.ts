@@ -1,7 +1,7 @@
-import { UserNotAdminError, UnauthorizedUserError } from "../errors/userError"
+import { UserNotAdminError, UnauthorizedUserError, UserNotFoundError } from "../errors/userError"
 import { User } from "../components/user"
 import UserDAO from "../dao/userDAO"
-import { Utility } from "../utilities"
+import { DateError, Utility } from "../utilities"
 
 /**
  * Represents a controller for managing users.
@@ -79,7 +79,11 @@ class UserController {
                 await this.dao.getUserByUsername(username);
                 resolve(true);
             } catch(error) {
-                resolve(false);
+                if (error instanceof UserNotFoundError){
+                    resolve(false);
+                } else {
+                    reject(error);
+                }
             }
         });
     }
@@ -106,7 +110,20 @@ class UserController {
      * @returns A Promise that resolves to true if all non-Admin users have been deleted.
      */
     async deleteAll() {
-        return this.dao.deleteAll();
+        //return this.dao.deleteAll();
+        
+        return new Promise<Boolean>(async (resolve, reject) => {
+            try {
+                if (await this.dao.deleteAll()){
+                    resolve(true);
+                } else {
+                    reject(new UserNotFoundError);
+                };
+            } catch (error) {
+                reject(error);
+            }
+        });
+        
     }
 
     /**
@@ -122,8 +139,12 @@ class UserController {
      */
     async updateUserInfo(user: User, name: string, surname: string, address: string, birthdate: string, username: string) /**:Promise<User> */ {
         return new Promise<User>((resolve, reject) => {
-            if(Utility.isAdmin(user) || user.username == username)     // todo: I should implement this checks in userRoutes.ts and not inside this controller
+            if(Utility.isAdmin(user) || user.username == username) {    // todo: I should implement this checks in userRoutes.ts and not inside this controller
+                if(birthdate > Utility.now()) {
+                    reject(new DateError);
+                }
                 resolve(this.dao.updateUserInfo(user, name, surname, address, birthdate, username));
+            }
             else reject(new UnauthorizedUserError);
         });
     }
