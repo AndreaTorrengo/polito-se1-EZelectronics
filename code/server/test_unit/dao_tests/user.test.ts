@@ -46,6 +46,22 @@ describe("Unit tests for UserDAO", () => {
             expect(mockTimingSafeEqual).toHaveBeenCalled();
         });
 
+        test("Password not valid", async () => {
+            const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+                callback(null, testCustomerJson);
+                return {} as Database;
+            });
+
+            const mockTimingSafeEqual = jest.spyOn(crypto, "timingSafeEqual").mockImplementation(() => {
+                return false;
+            });
+
+            const result = await userDAO.getIsUserAuthenticated(testCustomer.username, testPassword);
+            expect(result).toBe(false);
+            expect(mockDBGet).toHaveBeenCalled();
+            expect(mockTimingSafeEqual).toHaveBeenCalled();
+        });
+
         test("There is no user with the given username", async () => {
             const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
                 callback(null, null);

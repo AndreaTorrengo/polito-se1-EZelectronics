@@ -18,29 +18,25 @@ class UserDAO {
      */
     getIsUserAuthenticated(username: string, plainPassword: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            try {
-                /**
-                 * Example of how to retrieve user information from a table that stores username, encrypted password and salt (encrypted set of 16 random bytes that ensures additional protection against dictionary attacks).
-                 * Using the salt is not mandatory (while it is a good practice for security), however passwords MUST be hashed using a secure algorithm (e.g. scrypt, bcrypt, argon2).
-                 */
-                const sql = "SELECT username, password, salt FROM users WHERE username = ?"
-                db.get(sql, [username], (err: Error | null, row: any) => {
-                    if (err) reject(err)
-                    //If there is no user with the given username, or the user salt is not saved in the database, the user is not authenticated.
-                    if (!row || row.username !== username || !row.salt) {
-                        resolve(false)
-                    } else {
-                        //Hashes the plain password using the salt and then compares it with the hashed password stored in the database
-                        const hashedPassword = crypto.scryptSync(plainPassword, row.salt, 16)
-                        const passwordHex = Buffer.from(row.password, "hex")
-                        if (!crypto.timingSafeEqual(passwordHex, hashedPassword)) resolve(false)
-                        resolve(true)
-                    }
+            /**
+             * Example of how to retrieve user information from a table that stores username, encrypted password and salt (encrypted set of 16 random bytes that ensures additional protection against dictionary attacks).
+             * Using the salt is not mandatory (while it is a good practice for security), however passwords MUST be hashed using a secure algorithm (e.g. scrypt, bcrypt, argon2).
+             */
+            const sql = "SELECT username, password, salt FROM users WHERE username = ?"
+            db.get(sql, [username], (err: Error | null, row: any) => {
+                if (err) reject(err)
+                //If there is no user with the given username, or the user salt is not saved in the database, the user is not authenticated.
+                if (!row || row.username !== username || !row.salt) {
+                    resolve(false)
+                } else {
+                    //Hashes the plain password using the salt and then compares it with the hashed password stored in the database
+                    const hashedPassword = crypto.scryptSync(plainPassword, row.salt, 16)
+                    const passwordHex = Buffer.from(row.password, "hex")
+                    if (!crypto.timingSafeEqual(passwordHex, hashedPassword)) resolve(false)
+                    resolve(true)
+                }
 
-                })
-            } catch (error) {
-                reject(error)
-            }
+            });
 
         });
     }
@@ -56,22 +52,18 @@ class UserDAO {
      */
     createUser(username: string, name: string, surname: string, password: string, role: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            try {
-                const salt = crypto.randomBytes(16)
-                // scryptSync is a syncronous functions that generates a password-based key in hexadecimal, 
-                // designed to be computationally expensive. It takes a plain password, unique salt string at least 16 bytes long and KeyLength
-                const hashedPassword = crypto.scryptSync(password, salt, 16)
-                const sql = "INSERT INTO users(username, name, surname, role, password, salt) VALUES(?, ?, ?, ?, ?, ?)"
-                db.run(sql, [username, name, surname, role, hashedPassword, salt], (err: Error | null) => {
-                    if (err) {
-                        if (err.message.includes("UNIQUE constraint failed: users.username")) reject(new UserAlreadyExistsError)
-                        reject(err)
-                    }
-                    resolve(true)
-                })
-            } catch (error) {
-                reject(error)
-            }
+            const salt = crypto.randomBytes(16)
+            // scryptSync is a syncronous functions that generates a password-based key in hexadecimal, 
+            // designed to be computationally expensive. It takes a plain password, unique salt string at least 16 bytes long and KeyLength
+            const hashedPassword = crypto.scryptSync(password, salt, 16)
+            const sql = "INSERT INTO users(username, name, surname, role, password, salt) VALUES(?, ?, ?, ?, ?, ?)"
+            db.run(sql, [username, name, surname, role, hashedPassword, salt], (err: Error | null) => {
+                if (err) {
+                    if (err.message.includes("UNIQUE constraint failed: users.username")) reject(new UserAlreadyExistsError)
+                    reject(err)
+                }
+                resolve(true)
+            })
 
         })
     }
@@ -83,23 +75,19 @@ class UserDAO {
      */
     getUserByUsername(username: string): Promise<User> {
         return new Promise<User>((resolve, reject) => {
-            try {
-                const sql = "SELECT * FROM users WHERE username = ?"
-                db.get(sql, [username], (err: Error | null, row: any) => {
-                    if (err) {
-                        reject(err)
-                        return
-                    }
-                    if (!row) {
-                        reject(new UserNotFoundError())
-                        return
-                    }
-                    const user: User = new User(row.username, row.name, row.surname, row.role, row.address, row.birthdate)
-                    resolve(user)
-                })
-            } catch (error) {
-                reject(error)
-            }
+            const sql = "SELECT * FROM users WHERE username = ?"
+            db.get(sql, [username], (err: Error | null, row: any) => {
+                if (err) {
+                    reject(err)
+                    return
+                }
+                if (!row) {
+                    reject(new UserNotFoundError())
+                    return
+                }
+                const user: User = new User(row.username, row.name, row.surname, row.role, row.address, row.birthdate)
+                resolve(user)
+            });
 
         })
     }
@@ -120,24 +108,20 @@ class UserDAO {
      */
     getUsers(): Promise<User[]> {
         return new Promise<User[]>((resolve, reject) => {
-            try {
-                const sql = 'SELECT * FROM users';
-                db.all(sql, [], (err: Error | null, rows: any) => {
-                    if(err) {
-                        reject(err);
-                        return;
-                    }
-                    if(!rows) {
-                        reject(new UserNotFoundError());
-                        return;
-                    }
+            const sql = 'SELECT * FROM users';
+            db.all(sql, [], (err: Error | null, rows: any) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                if(!rows) {
+                    reject(new UserNotFoundError());
+                    return;
+                }
 
-                    let userArray = [...rows].map(row => this.mapDBrowToUserObject(row));
-                    resolve(userArray);
-                });
-            } catch(error) {
-                reject(error);
-            }
+                let userArray = [...rows].map(row => this.mapDBrowToUserObject(row));
+                resolve(userArray);
+            });
         });
     }
 
@@ -147,22 +131,18 @@ class UserDAO {
      */
     deleteUser(username: string): Promise<Boolean> {
         return new Promise<Boolean>((resolve, reject) => {
-            try {
-                const sql = 'DELETE FROM users WHERE username=?';
-                db.run(sql, [username], function(err) {
-                    if(err) {
-                        reject(err);
-                        return;
-                    }
-                    if(!this.changes) {
-                        resolve(false);
-                        return;
-                    }
-                    resolve(true);
-                });
-            } catch(error) {
-                reject(error);
-            }
+            const sql = 'DELETE FROM users WHERE username=?';
+            db.run(sql, [username], function(err) {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                if(!this.changes) {
+                    resolve(false);
+                    return;
+                }
+                resolve(true);
+            });
         });
     }
 
@@ -172,22 +152,18 @@ class UserDAO {
      */
     deleteAll(): Promise<Boolean> {
         return new Promise<Boolean>((resolve, reject) => {
-            try {
-                const sql = "DELETE FROM users WHERE role != 'Admin'";
-                db.run(sql, [], function(err) {
-                    if(err) {
-                        reject(err);
-                        return;
-                    }
-                    if(!this.changes) {
-                        resolve(false);
-                        return;
-                    }
-                    resolve(true);
-                });
-            } catch(error) {
-                reject(error);
-            }
+            const sql = "DELETE FROM users WHERE role != 'Admin'";
+            db.run(sql, [], function(err) {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                if(!this.changes) {
+                    resolve(false);
+                    return;
+                }
+                resolve(true);
+            });
         });
     }
 
@@ -203,23 +179,19 @@ class UserDAO {
      */
     updateUserInfo(user: User, name: string, surname: string, address: string, birthdate: string, username: string) {
         return new Promise<User>((resolve, reject) => {
-            try {
-                const sql = "UPDATE users SET name=?, surname=?, address=?, birthdate=? WHERE username=?";
-                db.run(sql, [name, surname, address, birthdate, username], function(err) {
-                    if(err){
-                        reject(err);
-                        return;
-                    }
-                    if(!this.changes) {
-                        reject(new UserNotFoundError);
-                        return;
-                    }
-                    // Note: if an admin edits another user, then this promise just return the same admin object
-                    resolve(user);
-                });
-            } catch(error) {
-                reject(error);
-            }
+            const sql = "UPDATE users SET name=?, surname=?, address=?, birthdate=? WHERE username=?";
+            db.run(sql, [name, surname, address, birthdate, username], function(err) {
+                if(err){
+                    reject(err);
+                    return;
+                }
+                if(!this.changes) {
+                    reject(new UserNotFoundError);
+                    return;
+                }
+                // Note: if an admin edits another user, then this promise just return the same admin object
+                resolve(user);
+            });
         });
     }
 }
