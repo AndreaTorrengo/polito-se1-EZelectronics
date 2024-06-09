@@ -5,6 +5,8 @@ import db from '../../src/db/db'
 import ReviewController from '../../src/controllers/reviewController';
 import { User, Role } from '../../src/components/user';
 import { ExistingReviewError, NoReviewProductError } from '../../src/errors/reviewError';
+import ProductDAO from '../../src/dao/productDAO';
+import { Category, Product } from '../../src/components/product';
 
 jest.mock("../../src/dao/reviewDAO");
 
@@ -55,20 +57,24 @@ describe("Unit tests for ReviewController", () => {
 
   describe("getProductReviews(model)", () => {
     test("Success - should return ProductReview[]", async () => {
+      const mockDAOproducts = jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(new Product(1,'a', Category.APPLIANCE, null, null, 1));
       const mockDAO = jest.spyOn(ReviewDAO.prototype, "getReviewsByProduct").mockResolvedValueOnce([testReviewJson]);
 
       const result = await reviewController.getProductReviews(testReviewJson.model);
       expect(result).toEqual([testReviewJson]);
       expect(mockDAO).toHaveBeenCalled();
+      expect(mockDAOproducts).toHaveBeenCalled();
     });
 
     test("DAO fail - should return the thrown error", async () => {
-      const err = new Error('DAO error');
+      const err = new Error();
+      const mockDAOproducts = jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(new Product(1,'a', Category.APPLIANCE, null, null, 1));
       const mockDAO = jest.spyOn(ReviewDAO.prototype, "getReviewsByProduct").mockRejectedValueOnce(err);
 
       const result = reviewController.getProductReviews(testReviewJson.model);
       await expect(result).rejects.toEqual(err);
       expect(mockDAO).toHaveBeenCalled();
+      expect(mockDAOproducts).toHaveBeenCalled();
     });
   });
 

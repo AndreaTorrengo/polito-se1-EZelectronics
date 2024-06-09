@@ -2,6 +2,8 @@ import db from "../db/db"
 
 import { ProductReview } from "../components/review";
 import { ProductNotInCartError } from "../errors/cartError";
+import { NoReviewProductError } from "../errors/reviewError";
+import { ProductNotFoundError } from "../errors/productError";
 /**
  * A class that implements the interaction with the database for all review-related operations.
  * You are free to implement any method you need here, as long as the requirements are satisfied.
@@ -67,7 +69,7 @@ class ReviewDAO {
             if (err) {
                 reject(err);
             } else if (row === undefined) {
-                resolve(/*{error: "Review not found"}*/);
+                reject(new NoReviewProductError());
             } else {
                 sql = "DELETE FROM review WHERE reviewID = ?";
                 db.run(sql, [row.reviewID], function (err) {
@@ -90,7 +92,7 @@ class ReviewDAO {
             if (err) {
                 reject(err);
             } else if (row === undefined) {
-                resolve({error: "Product not found"});
+                reject(new ProductNotFoundError());
             } else {
                 sql = "DELETE FROM review WHERE productID = ?";
                 db.run(sql, [row.productID], function (err) {

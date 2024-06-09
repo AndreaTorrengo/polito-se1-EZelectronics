@@ -4,6 +4,8 @@ import { Database } from 'sqlite3';
 import db from '../../src/db/db'
 import { ProductReview } from '../../src/components/review';
 import { ProductNotInCartError } from '../../src/errors/cartError';
+import { NoReviewProductError } from '../../src/errors/reviewError';
+import { ProductNotFoundError } from '../../src/errors/productError';
 
 jest.mock("../../src/db/db.ts");
 
@@ -151,13 +153,14 @@ describe("Unit tests for ReviewDAO", () => {
     });
 
     test("Review not found - Should return nothing (undefined)", async () => {
+      const err = new NoReviewProductError();
       const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
         callback(null, undefined);
         return {} as Database;
       });
       
       const result = reviewDAO.deleteUserReview(testReviewJson.model, 'test-username');
-      await expect(result).resolves.toBeUndefined();
+      await expect(result).rejects.toThrow(err);
       expect(mockDBGet).toHaveBeenCalled();
     });
 
@@ -213,13 +216,14 @@ describe("Unit tests for ReviewDAO", () => {
     });
 
     test("Product not found - Should return error", async () => {
+      const err = new ProductNotFoundError();
       const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
         callback.call(null, undefined);
         return {} as Database;
       });
       
       const result = reviewDAO.deleteProductReviews(testReviewJson.model);
-      await expect(result).resolves.toEqual({error: "Product not found"});
+      await expect(result).rejects.toStrictEqual(err)
       expect(mockDBGet).toHaveBeenCalled();
     });
 
