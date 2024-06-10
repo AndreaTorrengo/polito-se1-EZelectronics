@@ -328,8 +328,6 @@ class CartDAO {
         let updatedQuantity; // default value will be 1 for adding a new product to the cart
         let productInCart;
 
-        console.log(cartRow);
-
         if (cartRow) {
           productInCart = cartRow.products.find((prod) => prod.model === model); // Extract the product object inside the cart
           // Compute the updated quantity of the product (if already is in the cart)
