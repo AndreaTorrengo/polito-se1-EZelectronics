@@ -38,7 +38,7 @@ describe("test registrazione prodotto", ()=>{
         const controller=new ProductController();
         const response= controller.registerProducts(testProduct.model, testProduct.category,testProduct.quantity, testProduct.details, testProduct.sellingPrice, testProduct.arrivalDate);
         await expect(response).rejects.toThrow(new ProductAlreadyExistsError());
-        expect(ProductDAO.prototype.insertProduct).toBeCalledTimes(1);
+        expect(ProductDAO.prototype.insertProduct).toBeCalledTimes(0);
         
     });
 
