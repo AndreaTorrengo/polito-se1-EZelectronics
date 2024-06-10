@@ -392,7 +392,7 @@ describe("Route unit tests", ()=>{
         });
 
 
-        test("It should return a 409 error code when quantity=0", async () => {
+        test("It should return a 409 error code when quantity not sufficient", async () => {
             const inputProduct = { sellingPrice: 57.00, model: "provaerrore409", category: Category.LAPTOP, arrivalDate: "2015-01-01", details: "test", quantity: 10 }
             jest.mock('express-validator', () => ({
                 param: jest.fn().mockImplementation(() => ({

@@ -21,7 +21,7 @@ describe("test registrazione prodotto", ()=>{
     
     test("registrare nuovo prodotto", async()=>{
         const testProduct=new Product(89.00,"test modello", Category.LAPTOP,"2023-07-07","test descrizione",20)
-        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockRejectedValueOnce(new ProductNotFoundError());
+        jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(new ProductNotFoundError());
         jest.spyOn(ProductDAO.prototype, "insertProduct").mockResolvedValueOnce(true);
         const controller=new ProductController();
         const response= await controller.registerProducts(testProduct.model, testProduct.category,testProduct.quantity, testProduct.details, testProduct.sellingPrice, testProduct.arrivalDate);
@@ -38,7 +38,7 @@ describe("test registrazione prodotto", ()=>{
         const controller=new ProductController();
         const response= controller.registerProducts(testProduct.model, testProduct.category,testProduct.quantity, testProduct.details, testProduct.sellingPrice, testProduct.arrivalDate);
         await expect(response).rejects.toThrow(new ProductAlreadyExistsError());
-        expect(ProductDAO.prototype.insertProduct).toBeCalledTimes(1);
+        expect(ProductDAO.prototype.insertProduct).toBeCalledTimes(0);
         
     });
 

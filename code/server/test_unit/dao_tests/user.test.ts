@@ -297,25 +297,31 @@ describe("Unit tests for UserDAO", () => {
 
     describe("updateUserInfo(...)", () => {
         test("User updated successfully", async () => {
+            const testChanges = {name: "newName", surname: "newSurname", address: "newAddress", birthdate: "newBirthdate"};
+            const testNewCustomer = new User(testCustomer.username, testChanges.name, testChanges.surname, testCustomer.role, testChanges.address, testChanges.birthdate);
             const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
                 callback.call({changes: 1}, null);
                 return {} as Database
             });
+            const mockGetUser = jest.spyOn(UserDAO.prototype, "getUserByUsername").mockResolvedValueOnce(testNewCustomer); 
 
-            const result = await userDAO.updateUserInfo(testCustomer, "name", "surname", "address", "birthdate", "username");
-            expect(result).toStrictEqual(testCustomer);
+            const result = await userDAO.updateUserInfo(testChanges.name, testChanges.surname, testChanges.address, testChanges.birthdate, testCustomer.username);
+            expect(result).toStrictEqual(testNewCustomer);
             expect(mockDBRun).toHaveBeenCalled();
+            expect(mockGetUser).toHaveBeenCalled();
         });
 
         test("User not found", async () => {
             const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
-                callback.call({changes: 0}, null);
+                callback(null);
                 return {} as Database
             });
+            const mockGetUser = jest.spyOn(UserDAO.prototype, "getUserByUsername").mockRejectedValueOnce(new UserNotFoundError);
 
-            const result = userDAO.updateUserInfo(testCustomer, "name", "surname", "address", "birthdate", "username");
+            const result = userDAO.updateUserInfo("name", "surname", "address", "birthdate", "username");
             await expect(result).rejects.toEqual(new UserNotFoundError);
             expect(mockDBRun).toHaveBeenCalled();
+            expect(mockGetUser).toHaveBeenCalled();
         });
 
         test("An error occours in DB", async () => {
@@ -325,7 +331,7 @@ describe("Unit tests for UserDAO", () => {
                 return {} as Database
             });
 
-            const result = userDAO.updateUserInfo(testCustomer, "name", "surname", "address", "birthdate", "username");
+            const result = userDAO.updateUserInfo("name", "surname", "address", "birthdate", "username");
             await expect(result).rejects.toEqual(err);
             expect(mockDBRun).toHaveBeenCalled();
         });

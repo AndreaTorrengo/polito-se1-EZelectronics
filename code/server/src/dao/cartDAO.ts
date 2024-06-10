@@ -2,7 +2,7 @@
  * A class that implements the interaction with the database for all cart-related operations.
  */
 
-import { CartNotFoundError, EmptyCartError } from "../errors/cartError";
+import { CartNotFoundError, EmptyCartError, ProductNotInCartError } from "../errors/cartError";
 import { Cart, ProductInCart } from "../components/cart";
 import db from "../db/db";
 import { ProductNotFoundError } from "../errors/productError";
@@ -374,8 +374,8 @@ class CartDAO {
 
         const cart = await this.getUserCurrentCart(username);
 
-        if (cart.products.length === 0) {
-          throw new EmptyCartError();
+        if (!cart.products.find((p) => p.model === product)) {
+          throw new ProductNotInCartError();
         }
 
         const result = await this.editProductInCartQuantity(cartID, username, product, -1);

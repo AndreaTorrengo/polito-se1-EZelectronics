@@ -39,10 +39,10 @@ class ProductController {
   ): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
-        try {
-          await this.dao.getProductByModel(model);
-        } catch (err) {
-          if (!(err instanceof ProductNotFoundError)) throw err;
+        const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof Product) {
+          throw new ProductAlreadyExistsError();
         }
 
         const date = arrivalDate ? arrivalDate : Utility.now();
@@ -77,6 +77,10 @@ class ProductController {
     return new Promise(async (resolve, reject) => {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
 
         const date = changeDate ? changeDate : Utility.now();
 
@@ -113,6 +117,10 @@ class ProductController {
     return new Promise(async (resolve, reject) => {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
 
         if (oldProduct.quantity === 0) {
           throw new EmptyProductStockError();
@@ -195,12 +203,16 @@ class ProductController {
   ): Promise<Product[]> {
     return new Promise(async (resolve, reject) => {
       try {
-        const products = (await this.dao.getProducts()).filter((p) => p.quantity > 0);
+        let products = (await this.dao.getProducts()).filter((p) => p.quantity > 0);
 
         if (grouping === "category" && (category as Category)) {
-          resolve(products.filter((p) => p.category === category));
+          products = products.filter((p) => p.category === category);
         } else if (grouping === "model" && model) {
-          resolve(products.filter((p) => p.model === model));
+          products = products.filter((p) => p.model === model);
+
+          if (products.length === 0) {
+            throw new ProductNotFoundError();
+          }
         }
 
         resolve(products);
@@ -235,6 +247,10 @@ class ProductController {
     return new Promise(async (resolve, reject) => {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
 
         const changes = await this.dao.deleteProductByModel(model);
 

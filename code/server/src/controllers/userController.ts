@@ -1,4 +1,4 @@
-import { UserNotAdminError, UnauthorizedUserError, UserNotFoundError } from "../errors/userError"
+import { UserNotAdminError, UnauthorizedUserError, UserNotFoundError, UserAlreadyExistsError } from "../errors/userError"
 import { User } from "../components/user"
 import UserDAO from "../dao/userDAO"
 import { DateError, Utility } from "../utilities"
@@ -24,7 +24,16 @@ class UserController {
      * @returns A Promise that resolves to true if the user has been created.
      */
     async createUser(username: string, name: string, surname: string, password: string, role: string) /**:Promise<Boolean> */ {
-        return this.dao.createUser(username, name, surname, password, role)
+        //return this.dao.createUser(username, name, surname, password, role)
+        return new Promise<Boolean>(async (resolve, reject) => {
+            const userExists = await this.usernameAlreadyInUse(username);
+            if(userExists) {
+                reject(new UserAlreadyExistsError());
+                return;
+            }
+            
+            resolve(await this.dao.createUser(username, name, surname, password, role))
+        });
     }
 
     /**
@@ -143,7 +152,7 @@ class UserController {
                 if(birthdate > Utility.now()) {
                     reject(new DateError);
                 }
-                resolve(this.dao.updateUserInfo(user, name, surname, address, birthdate, username));
+                resolve(this.dao.updateUserInfo(name, surname, address, birthdate, username));
             }
             else reject(new UnauthorizedUserError);
         });
