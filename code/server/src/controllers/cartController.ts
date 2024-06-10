@@ -79,7 +79,16 @@ class CartController {
     return new Promise(async (resolve, reject) => {
       try {
         const productController = new ProductController();
-        const cart = await this.getCart(user);
+        const cart = await this.dao.getUserCurrentCart(user.username);
+        console.log(cart);
+
+        if (cart === undefined) {
+          throw new CartNotFoundError();
+        }
+
+        if (cart.products.length === 0) {
+          throw new EmptyCartError();
+        }
 
         const availableProducts = await productController.getAvailableProducts(null, null, null);
 

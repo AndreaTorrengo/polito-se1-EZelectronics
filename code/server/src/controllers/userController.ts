@@ -3,10 +3,6 @@ import { User } from "../components/user"
 import UserDAO from "../dao/userDAO"
 import { DateError, Utility } from "../utilities"
 
-const now = (): string => {
-    return new Date().toISOString().split("T")[0];
-};
-
 /**
  * Represents a controller for managing users.
  * All methods of this class must interact with the corresponding DAO class to retrieve or store data.
@@ -83,7 +79,11 @@ class UserController {
                 await this.dao.getUserByUsername(username);
                 resolve(true);
             } catch(error) {
-                resolve(false);
+                if (error instanceof UserNotFoundError){
+                    resolve(false);
+                } else {
+                    reject(error);
+                }
             }
         });
     }
@@ -112,12 +112,16 @@ class UserController {
     async deleteAll() {
         //return this.dao.deleteAll();
         
-        return new Promise<Boolean>((resolve, reject) => {
-            if (this.dao.deleteAll()){
-                resolve(true);
-            } else {
-                reject(new UserNotFoundError);
-            };
+        return new Promise<Boolean>(async (resolve, reject) => {
+            try {
+                if (await this.dao.deleteAll()){
+                    resolve(true);
+                } else {
+                    reject(new UserNotFoundError);
+                };
+            } catch (error) {
+                reject(error);
+            }
         });
         
     }
@@ -136,7 +140,7 @@ class UserController {
     async updateUserInfo(user: User, name: string, surname: string, address: string, birthdate: string, username: string) /**:Promise<User> */ {
         return new Promise<User>((resolve, reject) => {
             if(Utility.isAdmin(user) || user.username == username) {    // todo: I should implement this checks in userRoutes.ts and not inside this controller
-                if(birthdate > now()) {
+                if(birthdate > Utility.now()) {
                     reject(new DateError);
                 }
                 resolve(this.dao.updateUserInfo(user, name, surname, address, birthdate, username));

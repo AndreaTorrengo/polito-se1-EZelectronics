@@ -1,12 +1,13 @@
-import { describe, test, expect, beforeAll, afterAll } from "@jest/globals"
+import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from "@jest/globals"
 import request from 'supertest'
 import { app } from "../index"
 import { cleanup } from "../src/db/cleanup"
 import { Category } from "../src/components/product"
 import ProductDAO from "../src/dao/productDAO"
 import CartDAO from "../src/dao/cartDAO"
-import { ExistingReviewError } from "../src/errors/reviewError"
+import { ExistingReviewError, NoReviewProductError } from "../src/errors/reviewError"
 import { ProductNotInCartError } from "../src/errors/cartError"
+import { ProductNotFoundError } from "../src/errors/productError"
 
 const routePath = "/ezelectronics" //Base route path for the API
 
@@ -14,7 +15,7 @@ const routePath = "/ezelectronics" //Base route path for the API
 const customer = { username: "customer", name: "customer", surname: "customer", password: "customer", role: "Customer" };
 const manager = { username: "manager", name: "manager", surname: "manager", password: "manager", role: "Manager" };
 const admin = { username: "admin", name: "admin", surname: "admin", password: "admin", role: "Admin" };
-// Review data
+// Review data (product will have 1 review, while product2 won't have any)
 const product = {model: 'test-model', category: "Appliance", quantity: 3, details: 'some details', sellingPrice: 50, arrivalDate: '2024-06-06'};
 const product2 = {model: 'test-model-2', category: "Smartphone", quantity: 3, details: 'other details', sellingPrice: 20, arrivalDate: '2024-06-06'};
 const review = {model: product.model, user: customer.username, score: 4, comment: 'test comment', date: '2024-06-06'};
@@ -99,6 +100,18 @@ const purchaseProduct = (username: String, productModel: string) => {
   });
 };
 
+// Add review for a purchased product
+const addReview = (review: any, userCookie: any) => {
+  return new Promise((resolve, reject) => {
+    request(app)
+      .post(`${routePath}/reviews/${review.model}`)
+      .set("Cookie", userCookie).send(review).expect(200)
+      .then(() => {
+        resolve(undefined)
+      }).catch((err) => reject(err));
+  });
+};
+
 //Before executing tests, we remove everything from our test database, create an Admin user and log in as Admin, saving the cookie in the corresponding variable
 beforeAll(async () => {
   cleanup()
@@ -126,11 +139,8 @@ afterAll(() => {
 describe("Review routes integration tests", () => {
   describe("Route for adding a new review for a product - POST /:model", () => {
     test("Create a new review - Should return 200 success", async () => {
-      const response = await request(app)
-      .post(`${routePath}/reviews/${review.model}`)
-      .set("Cookie", customerCookie).send(review);
-
-      expect(response.status).toBe(200);
+      // Testing code 200 (success) is done inside the following function
+      await addReview(review, customerCookie);
     });
     test("Manager attemps to write a review - Should return 401 unauthorized", async () => {
       const response = await request(app)
@@ -155,6 +165,94 @@ describe("Review routes integration tests", () => {
 
       expect(response.status).toEqual(err.customCode);
       expect(JSON.parse(response.text).error).toEqual(err.customMessage);
+    });
+  });
+
+  describe("Route for getting all reviews for a product - GET /:model", () => {
+    test("Get all product reviews - Should return 200 success", async () => {
+      const response = await request(app)
+      .get(`${routePath}/reviews/${review.model}`)
+      .set("Cookie", customerCookie)
+      .expect(200)
+
+      expect(response.body).toHaveLength(1);
+      let rev = response.body[0];
+      expect(rev).toBeDefined();
+      expect(rev.model).toBe(review.model);
+      expect(rev.user).toBe(review.user);
+    });
+
+    test("No available reviews - Should return 200 success, with empty response", async () => {
+      const response = await request(app)
+      .get(`${routePath}/reviews/${product2.model}`)
+      .set("Cookie", customerCookie)
+      .expect(200)
+
+      expect(response.body).toHaveLength(0);
+    });
+
+    test("Invalid model - Should return ProductNotFoundError", async () => {
+      const err = new ProductNotFoundError();
+      const response = await request(app)
+      .get(`${routePath}/reviews/invalid-model`)
+      .set("Cookie", customerCookie)
+      
+      expect(response.status).toEqual(err.customCode);
+      expect(JSON.parse(response.text).error).toEqual(err.customMessage);
+    });
+
+    test("User not logged in - Should return 401", async () => {
+      const response = await request(app)
+      .get(`${routePath}/reviews/${product.model}`)
+      .expect(401)
+    });
+  });
+
+  describe("Route for deleting a review by model - DELETE /:model", () => {
+    test("Delete customer review by model - Should return 200 success", async () => {
+      const response = await request(app)
+      .delete(`${routePath}/reviews/${review.model}`)
+      .set("Cookie", customerCookie)
+      .expect(200)
+    });
+    test("Invalid model - Should return NoReviewProductError", async () => {
+      const err = new NoReviewProductError();
+      const response = await request(app)
+      .delete(`${routePath}/reviews/InvalidModel`)
+      .set("Cookie", customerCookie)
+      .expect(err.customCode)
+      
+      expect(JSON.parse(response.text).error).toEqual(err.customMessage);
+    });
+    test("User is not a customer - Should return 401", async () => {
+      const response = await request(app)
+      .delete(`${routePath}/reviews/${review.model}`)
+      .expect(401)
+    });
+  });
+
+  describe("Route for deleting all reviews of a product - DELETE /:model/all", () => {
+    test("Delete all reviews for a model - Should return 200 success", async () => {
+      // re-add previously deleted review
+      await addReview(review, customerCookie);
+      const response = await request(app)
+      .delete(`${routePath}/reviews/${review.model}/all`)
+      .set("Cookie", managerCookie)
+      .expect(200)
+    });
+    test("Invalid model - Should return NoReviewProductError", async () => {
+      const err = new ProductNotFoundError();
+      const response = await request(app)
+      .delete(`${routePath}/reviews/InvalidModel/all`)
+      .set("Cookie", managerCookie)
+      .expect(err.customCode)
+      
+      expect(JSON.parse(response.text).error).toEqual(err.customMessage);
+    });
+    test("User is not a customer - Should return 401", async () => {
+      const response = await request(app)
+      .delete(`${routePath}/reviews/${review.model}/all`)
+      .expect(401)
     });
   });
 });

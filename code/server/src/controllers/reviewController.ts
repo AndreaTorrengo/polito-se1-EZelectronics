@@ -4,18 +4,17 @@ import {
 } from "../errors/reviewError";
 import { User } from "../components/user";
 import ReviewDAO from "../dao/reviewDAO";
+import ProductDAO from "../dao/productDAO";
 import { ProductReview } from "../components/review";
-
-function getCurrentDate(): string {
-  const currentDate = new Date();
-  return currentDate.toISOString().slice(0, 10);
-}
+import { Utility } from "../utilities";
 
 class ReviewController {
   private dao: ReviewDAO;
+  private productDao: ProductDAO;
 
   constructor() {
     this.dao = new ReviewDAO();
+    this.productDao = new ProductDAO();
   }
 
   /**
@@ -39,7 +38,7 @@ class ReviewController {
           user.username,
           score,
           comment,
-          getCurrentDate()
+          Utility.now(),
         );
 
         if (changes === 0) {
@@ -63,6 +62,9 @@ class ReviewController {
     //return this.dao.getReviewsByProduct(model);
     return new Promise(async (resolve, reject) => {
       try {
+        // check whether the product exists. Throws ProductNotFound error if model is invalid
+        const product = await this.productDao.getProductByModel(model);
+
         const productReviews = await this.dao.getReviewsByProduct(model);
         /*if (productReviews.length === 0) {
           //throw new NoReviewProductError();

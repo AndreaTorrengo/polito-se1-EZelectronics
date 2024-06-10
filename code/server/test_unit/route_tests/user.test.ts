@@ -59,7 +59,7 @@ describe("Unit test for userRoutes", () => {
       jest.spyOn(UserController.prototype, "createUser").mockRejectedValueOnce(new UserAlreadyExistsError());
 
       const response = await request(app).post(baseURL + "/users").send(testUser);
-      expect(response.status).toBe(new UserAlreadyExistsError().customCode)   // Expect to throw 409 error
+      expect(response.status).toBe(409)   // Expect to throw 409 error
     });
   });
 
