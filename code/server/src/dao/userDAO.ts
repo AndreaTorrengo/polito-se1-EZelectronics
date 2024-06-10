@@ -82,7 +82,7 @@ class UserDAO {
                     return
                 }
                 if (!row) {
-                    reject(new UserNotFoundError())
+                    reject(new UserNotFoundError)
                     return
                 }
                 const user: User = new User(row.username, row.name, row.surname, row.role, row.address, row.birthdate)
@@ -177,15 +177,16 @@ class UserDAO {
      * @returns A Promise that resolves to the updated user
      */
     updateUserInfo(name: string, surname: string, address: string, birthdate: string, username: string) {
-        return new Promise<User>(async (resolve, reject) => {
+        return new Promise<User>( (resolve, reject) => {
             const sql = "UPDATE users SET name=?, surname=?, address=?, birthdate=? WHERE username=?";
 
-            db.run(sql, [name, surname, address, birthdate, username], async (err: Error | null, row: any) => {
+            db.run(sql, [name, surname, address, birthdate, username], (err: Error | null, row: any) => {
                 if(err){
                     reject(err);
                     return;
                 }
-                resolve(await this.getUserByUsername(username));
+                //resolve(await this.getUserByUsername(username));
+                this.getUserByUsername(username).then((user) => resolve(user)).catch((err) => reject(err))
             });
         });
     }
