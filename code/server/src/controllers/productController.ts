@@ -41,8 +41,8 @@ class ProductController {
       try {
         try {
           const modelExist = await this.dao.getProductByModel(model);
-          if(modelExist!==undefined) {
-            throw new ProductAlreadyExistsError;
+          if (modelExist !== undefined) {
+            throw new ProductAlreadyExistsError();
           }
         } catch (err) {
           if (!(err instanceof ProductNotFoundError)) throw err;
@@ -115,9 +115,7 @@ class ProductController {
   async sellProduct(model: string, quantity: number, sellingDate: string | null): Promise<number> {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(model)
         const oldProduct = await this.dao.getProductByModel(model);
-        console.log(oldProduct)
 
         if (oldProduct.quantity === 0) {
           throw new EmptyProductStockError();
@@ -148,7 +146,6 @@ class ProductController {
 
         resolve(newQuantity);
       } catch (err) {
-        console.log(err)
         reject(err);
       }
     });
@@ -201,12 +198,16 @@ class ProductController {
   ): Promise<Product[]> {
     return new Promise(async (resolve, reject) => {
       try {
-        const products = (await this.dao.getProducts()).filter((p) => p.quantity > 0);
+        let products = (await this.dao.getProducts()).filter((p) => p.quantity > 0);
 
         if (grouping === "category" && (category as Category)) {
-          resolve(products.filter((p) => p.category === category));
+          products = products.filter((p) => p.category === category);
         } else if (grouping === "model" && model) {
-          resolve(products.filter((p) => p.model === model));
+          products = products.filter((p) => p.model === model);
+
+          if (products.length === 0) {
+            throw new ProductNotFoundError();
+          }
         }
 
         resolve(products);

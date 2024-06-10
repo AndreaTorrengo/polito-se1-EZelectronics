@@ -338,13 +338,13 @@ describe("GET /products/available", ()=>{
       const response = await request(app).get(baseURLProduct + `/available?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`).set("Cookie",customerCookie); //aggiustare la condizione è isLogged in
       expect(response.status).toBe(422);
   });
-/*
+
   test("It should return a 404 error code model not existing", async () => {
       const inputProduct = [{ sellingPrice: 57.00, model: "prova404", category: Category.LAPTOP, arrivalDate: "2015-01-01", details: "test", quantity: 10 }]
       const inputChoice={grouping: "model", category: "", model:"prova404"}
       const response = await request(app).get(baseURLProduct + `/available?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`).set("Cookie",customerCookie); //aggiustare la condizione è isLogged in
       expect(response.status).toBe(404);
-  });*/
+  });
 });
 
 describe("DELETE /products/:model", ()=>{
@@ -375,13 +375,5 @@ describe("DELETE /products", ()=>{
       const response = await request(app).delete(baseURLProduct).set("Cookie",adminCookie); //aggiustare in admin o manager
       expect(response.status).toBe(200)       
   })
-/*
-  test("It should return a 404 error code products not found", async () => {
-      cleanup();
-      const inputProduct = []
-      const response = await request(app).delete(baseURLProduct).set("Cookie",adminCookie); //aggiustare in admin o manager
-      expect(response.status).toBe(404);
-  });*/
-
 
 });
