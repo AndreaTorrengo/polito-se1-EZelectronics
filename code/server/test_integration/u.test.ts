@@ -2,7 +2,6 @@ import { describe, test, expect, beforeAll, afterAll } from "@jest/globals"
 import request from 'supertest'
 import { app } from "../index"
 import db from "../src/db/db"
-
 import { cleanup } from "../src/db/cleanup"
 
 const routePath = "/ezelectronics" //Base route path for the API
@@ -94,7 +93,7 @@ describe("User routes integration tests", () => {
             await request(app).post(`${routePath}/users`).send({ username: "test", name: "", surname: "test", password: "test", role: "Customer" }).expect(422) //We can repeat the call for the remaining body parameters
         })
 
-        test("It should return 409 error code if 'username' represents a user that is already in the database", async () => {
+        test("It should return a 409 error code if the user is already in the database", async () => {
             await request(app)
                 .post(`${routePath}/users`) //The route path is specified here. Other operation types can be defined with similar blocks (e.g. 'get', 'patch', 'delete'). Route and query parameters can be added to the path
                 .send(customer) //In case of a POST request, the data is sent in the body of the request. It is specified with the 'send' block. The data sent should be consistent with the API specifications in terms of names and types

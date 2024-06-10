@@ -34,6 +34,10 @@ class CartController {
 
         const productToAdd = await productDAO.getProductByModel(product);
 
+        if (productToAdd instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
+
         if (productToAdd.quantity == 0) {
           throw new EmptyProductStockError();
         }
@@ -80,7 +84,6 @@ class CartController {
       try {
         const productController = new ProductController();
         const cart = await this.dao.getUserCurrentCart(user.username);
-        console.log(cart);
 
         if (cart === undefined) {
           throw new CartNotFoundError();
@@ -90,15 +93,23 @@ class CartController {
           throw new EmptyCartError();
         }
 
-        const availableProducts = await productController.getAvailableProducts(null, null, null);
+        const availableProducts = await productController.getProducts(null, null, null);
 
         cart.products.forEach((product) => {
           let p = availableProducts.find(
             (availableProduct) =>
-              product.model === availableProduct.model && product.quantity <= availableProduct.quantity
+              product.model === availableProduct.model
           );
 
           if (p === undefined) {
+            throw new ProductNotFoundError();
+          }
+
+          if (p.quantity === 0) {
+            throw new EmptyProductStockError();
+          }
+
+          if (p.quantity < product.quantity) {
             throw new LowProductStockError();
           }
         });
@@ -158,8 +169,7 @@ class CartController {
       try {
         const currentCartID = await this.dao.getCurrentCartId(user.username);
         if (!currentCartID) {
-          reject(new CartNotFoundError());
-          return;
+          throw new CartNotFoundError();
         }
         const result = await this.dao.deleteUserCart(currentCartID);
         resolve(result);

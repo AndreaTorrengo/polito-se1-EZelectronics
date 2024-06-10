@@ -39,13 +39,10 @@ class ProductController {
   ): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
-        try {
-          const modelExist = await this.dao.getProductByModel(model);
-          if (modelExist !== undefined) {
-            throw new ProductAlreadyExistsError();
-          }
-        } catch (err) {
-          if (!(err instanceof ProductNotFoundError)) throw err;
+        const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof Product) {
+          throw new ProductAlreadyExistsError();
         }
 
         const date = arrivalDate ? arrivalDate : Utility.now();
@@ -80,6 +77,10 @@ class ProductController {
     return new Promise(async (resolve, reject) => {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
 
         const date = changeDate ? changeDate : Utility.now();
 
@@ -116,6 +117,10 @@ class ProductController {
     return new Promise(async (resolve, reject) => {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
 
         if (oldProduct.quantity === 0) {
           throw new EmptyProductStockError();
@@ -242,6 +247,10 @@ class ProductController {
     return new Promise(async (resolve, reject) => {
       try {
         const oldProduct = await this.dao.getProductByModel(model);
+
+        if (oldProduct instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
 
         const changes = await this.dao.deleteProductByModel(model);
 

@@ -9,7 +9,7 @@ import { ProductNotFoundError } from "../errors/productError";
 
 function mapRowsToProduct(rows: any): Product[] {
   return rows.map(
-    (row:any) =>
+    (row: any) =>
       new Product(row.sellingPrice, row.model, row.category, row.arrivalDate, row.details, row.quantity)
   );
 }
@@ -38,7 +38,7 @@ class ProductDAO {
    * @param model The unique model of the product.
    * @returns A Promise that resolve to a Product object.
    */
-  getProductByModel(model: String): Promise<Product> {
+  getProductByModel(model: String): Promise<Product | ProductNotFoundError> {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM PRODUCTS WHERE model = ?";
 
@@ -46,7 +46,7 @@ class ProductDAO {
         if (err) {
           reject(err);
         } else if (row === undefined) {
-          reject(new ProductNotFoundError());
+          resolve(new ProductNotFoundError());
         } else {
           resolve(mapRowsToProduct([row])[0]);
         }
