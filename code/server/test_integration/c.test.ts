@@ -256,9 +256,29 @@ describe("PATCH /ezelectronics/carts", () => {
     expect(response.status).toBe(400);
   });
 
-  test("", async () => {});
+  test("At least one product in cart has available quantity lesser than requested quantity", async () => {
+    const response1 = await request(app).post(baseURLCart).set("Cookie", customerCookie2).send(testProduct2);
+    const response2 = await request(app).post(baseURLCart).set("Cookie", customerCookie2).send(testProduct2);
 
-  test("", async () => {});
+    expect(response1.status).toBe(200);
+    expect(response2.status).toBe(200);
+
+    await sellProduct(testProduct2.model, testProduct2.quantity - 1, null);
+
+    const response = await request(app).patch(baseURLCart).set("Cookie", customerCookie2);
+    expect(response.status).toBe(409);
+  });
+
+  test("At least one product in cart has available quantity as zero", async () => {
+    const response1 = await request(app).post(baseURLCart).set("Cookie", customerCookie2).send(testProduct2);
+
+    expect(response1.status).toBe(200);
+
+    await sellProduct(testProduct2.model, 1, null);
+
+    const response = await request(app).patch(baseURLCart).set("Cookie", customerCookie2);
+    expect(response.status).toBe(409);
+  });
 });
 
 describe("DELETE /ezelectronics/carts/products/:model", () => {

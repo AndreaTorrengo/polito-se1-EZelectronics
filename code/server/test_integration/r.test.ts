@@ -31,7 +31,7 @@ const postUser = async (userInfo: any) => {
   await request(app)
     .post(`${routePath}/users`)
     .send(userInfo)
-    //.expect(200);
+    .expect(200);
 }
 
 //Helper function that logs in a user and returns the cookie
@@ -41,7 +41,7 @@ const login = async (userInfo: any) => {
     request(app)
       .post(`${routePath}/sessions`)
       .send(userInfo)
-      //.expect(200)
+      .expect(200)
       .end((err, res) => {
         if (err) {
           reject(err)
@@ -64,7 +64,6 @@ const login = async (userInfo: any) => {
 }*/
 
 const addProduct = (productData: any) => {
-  //return productDAO.insertProduct(productData);
   return new Promise((resolve, reject) => {
     request(app)
       .post(`${routePath}/products`)
@@ -149,13 +148,15 @@ describe("Review routes integration tests", () => {
       expect(response.status).toBe(401);
     });
     // We have used reviewID as primary key, so it is possible, without any other checks, to write multiple reviews for the same product by the same user
-    /*test("Customer has already reviewed the product - Should return ExistingReviewError", async () => {
+    test("Customer has already reviewed the product - Should return ExistingReviewError", async () => {
+      const err = new ExistingReviewError();
       const response = await request(app)
       .post(`${routePath}/reviews/${review.model}`)
       .set("Cookie", customerCookie).send(review);
 
-      expect(response.status).toBe(new ExistingReviewError().customCode);
-    });*/
+      expect(response.status).toBe(err.customCode);
+      expect(JSON.parse(response.text).error).toEqual(err.customMessage);
+    });
     test("Customer has not purchased the product - Should return ProductNotInCartError", async () => {
       const err = new ProductNotInCartError();
       const response = await request(app)
@@ -215,10 +216,19 @@ describe("Review routes integration tests", () => {
       .set("Cookie", customerCookie)
       .expect(200)
     });
-    test("Invalid model - Should return NoReviewProductError", async () => {
-      const err = new NoReviewProductError();
+    test("Product does not exists - Should return 404 ProductNotFoundError", async () => {
+      const err = new ProductNotFoundError();
       const response = await request(app)
       .delete(`${routePath}/reviews/InvalidModel`)
+      .set("Cookie", customerCookie)
+      .expect(err.customCode)
+      
+      expect(JSON.parse(response.text).error).toEqual(err.customMessage);
+    });
+    test("Review does not exists - Should return 404 NoReviewProductError", async () => {
+      const err = new NoReviewProductError();
+      const response = await request(app)
+      .delete(`${routePath}/reviews/${review.model}`)
       .set("Cookie", customerCookie)
       .expect(err.customCode)
       
@@ -249,9 +259,25 @@ describe("Review routes integration tests", () => {
       
       expect(JSON.parse(response.text).error).toEqual(err.customMessage);
     });
-    test("User is not a customer - Should return 401", async () => {
+    test("User is not a manager or admin - Should return 401", async () => {
       const response = await request(app)
       .delete(`${routePath}/reviews/${review.model}/all`)
+      .expect(401)
+    });
+  });
+
+  describe("Route for deleting all reviews of all products - DELETE /", () => {
+    test("Delete all reviews for a model - Should return 200 success", async () => {
+      // re-add previously deleted review
+      await addReview(review, customerCookie);
+      const response = await request(app)
+      .delete(`${routePath}/reviews`)
+      .set("Cookie", managerCookie)
+      .expect(200)
+    });
+    test("User is not a manager or admin - Should return 401", async () => {
+      const response = await request(app)
+      .delete(`${routePath}/reviews`)
       .expect(401)
     });
   });

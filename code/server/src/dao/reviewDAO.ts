@@ -2,7 +2,7 @@ import db from "../db/db"
 
 import { ProductReview } from "../components/review";
 import { ProductNotInCartError } from "../errors/cartError";
-import { NoReviewProductError } from "../errors/reviewError";
+import { ExistingReviewError, NoReviewProductError } from "../errors/reviewError";
 import { ProductNotFoundError } from "../errors/productError";
 /**
  * A class that implements the interaction with the database for all review-related operations.
@@ -41,23 +41,33 @@ class ReviewDAO {
   addProductReview(model: string, username: String, score: number, comment: string, date: String) {
     return new Promise((resolve, reject) => {
         let sql = "SELECT U.userID, P.productID FROM users AS U, products AS P, cart AS C, cartProducts AS CP WHERE U.userID=C.userID AND P.productID=CP.productID AND C.cartID=CP.cartID AND U.username = ? AND P.model = ? AND C.paid = 1";
-
+        
         db.get(sql, [username, model], (err, row :any) => {
             if (err) {
                 reject(err);
             } else if (row === undefined) {
                 reject(new ProductNotInCartError());
             } else {
-                sql = "INSERT INTO REVIEW (userID, productID, score, date, comment) VALUES (?, ?, ?, ?, ?)";
-                db.run(sql, [row.userID, row.productID, score, date, comment], function (err) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(this.changes);
-                    }
+              this.getReviewsByProduct(model).then((productReviews) => {
+                  // check whether the user has already reviewed this product
+                  const userReview = productReviews.filter((r: ProductReview) => r.user === username);
+                  if(userReview.length != 0) {
+                    reject(new ExistingReviewError());
+                    return;
+                  }
+
+                  sql = "INSERT INTO REVIEW (userID, productID, score, date, comment) VALUES (?, ?, ?, ?, ?)";
+                  db.run(sql, [row.userID, row.productID, score, date, comment], function (err) {
+                      if (err) {
+                          reject(err);
+                      } else {
+                          resolve(this.changes);
+                      }
+                  });
                 })
+              
             }
-        })
+        });
     })
   }
 

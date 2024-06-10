@@ -42,12 +42,7 @@ class ReviewController {
           Utility.now(),
         );
 
-        if (changes === 0) {
-          //throw new ExistingReviewError();
-          reject(new ExistingReviewError());
-        } else {
-          resolve();
-        }
+        resolve();
       } catch (err) {
         reject(err);
       }
@@ -89,7 +84,20 @@ class ReviewController {
    * @returns A Promise that resolves to nothing
    */
   async deleteReview(model: string, user: User): Promise<void> {
-    return this.dao.deleteUserReview(model, user.username);
+    return new Promise(async (resolve, reject) => {
+      try {
+        // check whether the product exists. Throws ProductNotFound error if model is invalid
+        const product = await this.productDao.getProductByModel(model);
+
+        if (product instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
+        await this.dao.deleteUserReview(model, user.username);
+        resolve();
+      } catch(err) {
+        reject(err);
+      }
+    });
   }
 
   /**
@@ -100,12 +108,13 @@ class ReviewController {
   async deleteReviewsOfProduct(model: string): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
-        const changes = await this.dao.deleteProductReviews(model);
-        if (changes === 0) {
+        const changes = await this.dao.deleteProductReviews(model); // throws error if model doesn't exists
+        resolve();
+        /*if (changes === 0) {
           reject(new NoReviewProductError());
         } else {
           resolve();
-        }
+        }*/
       } catch (err) {
         reject(err);
       }
