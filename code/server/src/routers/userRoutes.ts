@@ -62,10 +62,10 @@ class UserRoutes {
             body('surname').isString().notEmpty(),
             body('password').isString().notEmpty(),
             body('role').isIn(Object.values(Role)),
-            body('username').custom(async (username) => {
+            /*body('username').custom(async (username) => {
                 const userExists = await this.controller.usernameAlreadyInUse(username);
                 if(userExists) throw new UserAlreadyExistsError();
-            }),
+            }),*/
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => this.controller.createUser(req.body.username, req.body.name, req.body.surname, req.body.password, req.body.role)
                 .then(() => res.status(200).end())
