@@ -169,7 +169,6 @@ class UserDAO {
 
     /**
      * Updates the personal information of one user. The user can only update their own information.
-     * @param user The user who wants to update itself (any role) or others data (if user is admin)
      * @param name The new name of the user
      * @param surname The new surname of the user
      * @param address The new address of the user
@@ -177,20 +176,16 @@ class UserDAO {
      * @param username The username of the user to update.
      * @returns A Promise that resolves to the updated user
      */
-    updateUserInfo(user: User, name: string, surname: string, address: string, birthdate: string, username: string) {
+    updateUserInfo(name: string, surname: string, address: string, birthdate: string, username: string) {
         return new Promise<User>(async (resolve, reject) => {
-            const sql = "UPDATE users SET name=?, surname=?, address=?, birthdate=? WHERE username=? RETURNING *";
+            const sql = "UPDATE users SET name=?, surname=?, address=?, birthdate=? WHERE username=?";
 
-            db.run(sql, [name, surname, address, birthdate, username], function(err: Error | null, row: any) {
+            db.run(sql, [name, surname, address, birthdate, username], async (err: Error | null, row: any) => {
                 if(err){
                     reject(err);
                     return;
                 }
-                if(!this.changes || !row) {
-                    reject(new UserNotFoundError);
-                    return;
-                }
-                resolve(row);
+                resolve(await this.getUserByUsername(username));
             });
         });
     }

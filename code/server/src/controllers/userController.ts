@@ -143,7 +143,7 @@ class UserController {
                 if(birthdate > Utility.now()) {
                     reject(new DateError);
                 }
-                resolve(this.dao.updateUserInfo(user, name, surname, address, birthdate, username));
+                resolve(this.dao.updateUserInfo(name, surname, address, birthdate, username));
             }
             else reject(new UnauthorizedUserError);
         });
