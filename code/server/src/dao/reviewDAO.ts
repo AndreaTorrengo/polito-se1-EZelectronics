@@ -14,7 +14,7 @@ function mapRowsToReviews(rows: any[]): ProductReview[] {
     (row) =>
       new ProductReview(
         row.model,
-        row.user,
+        row.username,
         row.score,
         row.date,
         row.comment

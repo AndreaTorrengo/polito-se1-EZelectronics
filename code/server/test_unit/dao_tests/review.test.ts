@@ -26,7 +26,13 @@ describe("Unit tests for ReviewDAO", () => {
   describe("getReviewsByProduct(model)", () => {
     test("Success - Should return a ProductReview[] type", async () => {
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        callback(null, [testReviewJson]);   // function(err, rows) sqlite
+        callback(null, [{
+          model: testReviewJson.model,
+          score: testReviewJson.score,
+          date: testReviewJson.date,
+          comment: testReviewJson.comment,
+          username: testReviewJson.user
+        }]);   // function(err, rows) sqlite
         return {} as Database;
       });
   

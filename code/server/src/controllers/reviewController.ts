@@ -84,9 +84,20 @@ class ReviewController {
    * @returns A Promise that resolves to nothing
    */
   async deleteReview(model: string, user: User): Promise<void> {
-    // check whether the product exists. Throws ProductNotFound error if model is invalid
-    await this.productDao.getProductByModel(model);
-    return this.dao.deleteUserReview(model, user.username);
+    return new Promise(async (resolve, reject) => {
+      try {
+        // check whether the product exists. Throws ProductNotFound error if model is invalid
+        const product = await this.productDao.getProductByModel(model);
+
+        if (product instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
+        await this.dao.deleteUserReview(model, user.username);
+        resolve();
+      } catch(err) {
+        reject(err);
+      }
+    });
   }
 
   /**
