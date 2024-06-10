@@ -181,7 +181,7 @@ class UserDAO {
             const sql = "UPDATE users SET name=?, surname=?, address=?, birthdate=? WHERE username=?";
 
             db.run(sql, [name, surname, address, birthdate, username], (err: Error | null, row: any) => {
-                if(err){
+                if(err) {
                     reject(err);
                     return;
                 }

@@ -39,10 +39,11 @@ describe("Unit tests for ReviewController", () => {
           return Promise.resolve(0);
         });*/
       // Both mockImplementation and mockResolvedValueOnce works. This one is quicker
-      const mockDAO = jest.spyOn(ReviewDAO.prototype, "addProductReview").mockResolvedValueOnce(0);
+      const err = new ExistingReviewError();
+      const mockDAO = jest.spyOn(ReviewDAO.prototype, "addProductReview").mockRejectedValueOnce(err);
 
       const result = reviewController.addReview(testReviewJson.model, testCustomer, testReviewJson.score, testReviewJson.comment);
-      await expect(result).rejects.toEqual(new ExistingReviewError());
+      await expect(result).rejects.toEqual(err);
       expect(mockDAO).toHaveBeenCalled();
     });
 
@@ -81,10 +82,15 @@ describe("Unit tests for ReviewController", () => {
   describe("deleteReview(model, user)", () => {
     test("Success - should return void", async () => {
       const mockDAO = jest.spyOn(ReviewDAO.prototype, "deleteUserReview").mockResolvedValueOnce();
+      // Assuming that the product exists
+      const mock_getProductByModel = jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(
+        {sellingPrice: 40, model: 'test-product', category: Category.APPLIANCE, arrivalDate: null, details: null, quantity: 2}
+      );
 
       const result = await reviewController.deleteReview(testReviewJson.model, testCustomer);
       expect(result).toBeUndefined();
       expect(mockDAO).toHaveBeenCalled();
+      expect(mock_getProductByModel).toHaveBeenCalled();
     });
   });
 
@@ -99,7 +105,7 @@ describe("Unit tests for ReviewController", () => {
 
     test("Review does not exists - should return NoReviewProductError", async () => {
       const err = new NoReviewProductError();
-      const mockDAO = jest.spyOn(ReviewDAO.prototype, "deleteProductReviews").mockResolvedValueOnce(0); // this.changes
+      const mockDAO = jest.spyOn(ReviewDAO.prototype, "deleteProductReviews").mockRejectedValueOnce(err);
 
       const result = reviewController.deleteReviewsOfProduct(testReviewJson.model);
       await expect(result).rejects.toEqual(err);

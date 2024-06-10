@@ -4,14 +4,14 @@ import { Database } from 'sqlite3';
 import db from '../../src/db/db'
 import { ProductReview } from '../../src/components/review';
 import { ProductNotInCartError } from '../../src/errors/cartError';
-import { NoReviewProductError } from '../../src/errors/reviewError';
+import { ExistingReviewError, NoReviewProductError } from '../../src/errors/reviewError';
 import { ProductNotFoundError } from '../../src/errors/productError';
 
 jest.mock("../../src/db/db.ts");
 
 let reviewDAO: ReviewDAO;
 // For testing purpose, user is always undefined (cannot mock login module)
-let testReviewJson = {model: "test-product", score: 4, date: "2024-05-31", comment: "test-comment"};
+let testReviewJson = {model: "test-product", score: 4, date: "2024-05-31", comment: "test-comment", user: "test-username"};
 
 describe("Unit tests for ReviewDAO", () => {
   beforeEach(() => {
@@ -60,6 +60,8 @@ describe("Unit tests for ReviewDAO", () => {
         callback.call({changes: 1}, null);  // (this.changes, err) sqlite
         return {} as Database;
       });
+      // Assuming that the customer has not reviewed the product yet
+      const mock_getReviewsByProduct = jest.spyOn(reviewDAO, "getReviewsByProduct").mockResolvedValueOnce([]);
 
       const result = await reviewDAO.addProductReview(
         testReviewJson.model, 'test-username', testReviewJson.score, testReviewJson.comment, testReviewJson.date
@@ -67,6 +69,7 @@ describe("Unit tests for ReviewDAO", () => {
       expect(result).toBe(1);
       expect(mockDBGet).toHaveBeenCalled();
       expect(mockDBRun).toHaveBeenCalled();
+      expect(mock_getReviewsByProduct).toHaveBeenCalled();
     });
 
     test("Generic fail - Should return the thrown error", async () => {
@@ -76,7 +79,7 @@ describe("Unit tests for ReviewDAO", () => {
         callback(err, [testReviewJson]);
         return {} as Database;
       });
-
+      
       const result = reviewDAO.addProductReview(
         testReviewJson.model, 'test-username', testReviewJson.score, testReviewJson.comment, testReviewJson.date
       );
@@ -110,6 +113,8 @@ describe("Unit tests for ReviewDAO", () => {
         callback.call({changes: 1}, err);  // (this.changes, err) sqlite
         return {} as Database;
       });
+      // Assuming that the customer has not reviewed the product yet
+      const mock_getReviewsByProduct = jest.spyOn(reviewDAO, "getReviewsByProduct").mockResolvedValueOnce([]);
 
       const result = reviewDAO.addProductReview(
         testReviewJson.model, 'test-username', testReviewJson.score, testReviewJson.comment, testReviewJson.date
@@ -117,6 +122,25 @@ describe("Unit tests for ReviewDAO", () => {
       await expect(result).rejects.toThrow(err);
       expect(mockDBGet).toHaveBeenCalled();
       expect(mockDBRun).toHaveBeenCalled();
+      expect(mock_getReviewsByProduct).toHaveBeenCalled();
+    });
+
+    test("Customer has already reviewed the product - Should return ExistingReviewError", async () => {
+      const err = new ExistingReviewError();
+      // Assuming that the product has been purchased by the user
+      const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+        callback(null, [testReviewJson]);
+        return {} as Database;
+      });
+      // Assuming that the customer has already reviewed the product
+      const mock_getReviewsByProduct = jest.spyOn(reviewDAO, "getReviewsByProduct").mockResolvedValueOnce([testReviewJson]);
+
+      const result = reviewDAO.addProductReview(
+        testReviewJson.model, 'test-username', testReviewJson.score, testReviewJson.comment, testReviewJson.date
+      );
+      await expect(result).rejects.toThrow(err);
+      expect(mockDBGet).toHaveBeenCalled();
+      expect(mock_getReviewsByProduct).toHaveBeenCalled();
     });
   });
 
