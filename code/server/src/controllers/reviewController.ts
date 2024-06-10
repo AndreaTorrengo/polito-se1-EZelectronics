@@ -7,6 +7,7 @@ import ReviewDAO from "../dao/reviewDAO";
 import ProductDAO from "../dao/productDAO";
 import { ProductReview } from "../components/review";
 import { Utility } from "../utilities";
+import { ProductNotFoundError } from "../errors/productError";
 
 class ReviewController {
   private dao: ReviewDAO;
@@ -64,6 +65,10 @@ class ReviewController {
       try {
         // check whether the product exists. Throws ProductNotFound error if model is invalid
         const product = await this.productDao.getProductByModel(model);
+
+        if (product instanceof ProductNotFoundError) {
+          throw new ProductNotFoundError();
+        }
 
         const productReviews = await this.dao.getReviewsByProduct(model);
         /*if (productReviews.length === 0) {
