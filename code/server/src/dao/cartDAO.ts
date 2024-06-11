@@ -358,18 +358,14 @@ class CartDAO {
    */
   deleteUserCart(cartID: Number): Promise<Boolean> {
     return new Promise<Boolean>((resolve, reject) => {
-      try {
-        const sql = "DELETE FROM cart WHERE cartID=?";
-        db.run(sql, [cartID], function (err) {
-          if (err) {
-            reject(false);
-            return;
-          }
-          resolve(true);
-        });
-      } catch (error) {
-        reject(false);
-      }
+      const sql = "DELETE FROM cart WHERE cartID=?";
+      db.run(sql, [cartID], function (err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(true);
+      });
     });
   }
   /**
@@ -377,18 +373,14 @@ class CartDAO {
    */
   deleteAllCarts(): Promise<Boolean> {
     return new Promise<Boolean>((resolve, reject) => {
-      try {
-        const sql = "DELETE FROM cart";
-        db.run(sql, function (err) {
-          if (err) {
-            reject(false);
-            return;
-          }
-          resolve(true);
-        });
-      } catch (error) {
-        reject(false);
-      }
+      const sql = "DELETE FROM cart";
+      db.run(sql, [], function (err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(true);
+      });
     });
   }
 }
