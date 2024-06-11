@@ -2,7 +2,8 @@ import { describe, test, jest, expect, beforeEach, beforeAll, afterAll, afterEac
 import UserController from "../../src/controllers/userController"
 import UserDAO from "../../src/dao/userDAO"
 import { Role, User } from "../../src/components/user";
-import { UserNotAdminError, UserNotFoundError } from "../../src/errors/userError";
+import { UnauthorizedUserError, UserAlreadyExistsError, UserNotAdminError, UserNotFoundError } from "../../src/errors/userError";
+import { DateError } from "../../src/utilities";
 
 jest.mock("../../src/dao/userDAO")
 
@@ -25,6 +26,7 @@ describe("Unit tests for UserController", () => {
         //The test checks if the method returns true when the DAO method returns true
         //The test also expects the DAO method to be called once with the correct parameters
         test("Success - should return true", async () => {
+            const err = new UserNotFoundError();
             const testUser = { //Define a test user object
                 username: "test",
                 name: "test",
@@ -35,9 +37,14 @@ describe("Unit tests for UserController", () => {
             jest.spyOn(UserDAO.prototype, "createUser").mockResolvedValueOnce(true); //Mock the createUser method of the DAO
             //const controller = new UserController(); //Create a new instance of the controller
             //Call the createUser method of the controller with the test user object
+
+            const mock_usernameAlreadyInUse = jest.spyOn(UserDAO.prototype, "getUserByUsername").mockRejectedValueOnce(err);
+            
             const response = await userController.createUser(testUser.username, testUser.name, testUser.surname, testUser.password, testUser.role);
         
             //Check if the createUser method of the DAO has been called once with the correct parameters
+            //await expect(mock_usernameAlreadyInUse).rejects.toStrictEqual(err);
+            expect(mock_usernameAlreadyInUse).toHaveBeenCalled();
             expect(UserDAO.prototype.createUser).toHaveBeenCalledTimes(1);
             expect(UserDAO.prototype.createUser).toHaveBeenCalledWith(testUser.username,
                 testUser.name,
@@ -45,6 +52,28 @@ describe("Unit tests for UserController", () => {
                 testUser.password,
                 testUser.role);
             expect(response).toBe(true); //Check if the response is true
+        });
+
+        test("Username already exists - should return UserAlreadyExistsError", async () => {
+            const err = new UserAlreadyExistsError();
+            const testUser = { //Define a test user object
+                username: "test",
+                name: "test",
+                surname: "test",
+                password: "test",
+                role: "Manager"
+            }
+            jest.spyOn(UserDAO.prototype, "createUser").mockResolvedValueOnce(true); //Mock the createUser method of the DAO
+            //const controller = new UserController(); //Create a new instance of the controller
+            //Call the createUser method of the controller with the test user object
+
+            const mock_usernameAlreadyInUse = jest.spyOn(UserDAO.prototype, "getUserByUsername").mockResolvedValueOnce(testCustomer);
+            
+            const response = userController.createUser(testUser.username, testUser.name, testUser.surname, testUser.password, testUser.role);
+        
+            // Expect UserAlreadyExistsError
+            await expect(response).rejects.toStrictEqual(err);
+            expect(mock_usernameAlreadyInUse).toHaveBeenCalled();
         });
     });
 
@@ -169,30 +198,53 @@ describe("Unit tests for UserController", () => {
     });
 
     describe("updateUserInfo(...)", () => {
-        //Example of a unit test for the createUser method of the UserController
-        //The test checks if the method returns true when the DAO method returns true
-        //The test also expects the DAO method to be called once with the correct parameters
-        test("Success - should return true", async () => {
-            const testUser = { //Define a test user object
-                username: "test",
-                name: "test",
-                surname: "test",
-                password: "test",
-                role: "Manager"
-            }
-            jest.spyOn(UserDAO.prototype, "createUser").mockResolvedValueOnce(true); //Mock the createUser method of the DAO
-            //const controller = new UserController(); //Create a new instance of the controller
-            //Call the createUser method of the controller with the test user object
-            const response = await userController.createUser(testUser.username, testUser.name, testUser.surname, testUser.password, testUser.role);
+        test("Success - should return the updated user", async () => {
+            // Assuming that the DAO returns the updated user object
+            jest.spyOn(UserDAO.prototype, "updateUserInfo").mockResolvedValueOnce(testCustomer);
+            //Call the updateUserInfo method of the controller with the test user object
+            const response = await userController.updateUserInfo(testCustomer, testCustomer.name, testCustomer.surname, testCustomer.address, testCustomer.birthdate, testCustomer.username);
         
-            //Check if the createUser method of the DAO has been called once with the correct parameters
-            expect(UserDAO.prototype.createUser).toHaveBeenCalled();
-            expect(UserDAO.prototype.createUser).toHaveBeenCalledWith(testUser.username,
-                testUser.name,
-                testUser.surname,
-                testUser.password,
-                testUser.role);
-            expect(response).toBe(true); //Check if the response is true
+            //Check if the updateUserInfo method of the DAO has been called once with the correct parameters
+            expect(UserDAO.prototype.updateUserInfo).toHaveBeenCalled();
+            expect(UserDAO.prototype.updateUserInfo).toHaveBeenCalledWith(
+                testCustomer.name,
+                testCustomer.surname,
+                testCustomer.address, 
+                testCustomer.birthdate, 
+                testCustomer.username);
+            expect(response).toStrictEqual(testCustomer);
+        });
+
+        test("Customer tries to update another user information - should return 401", async () => {
+            // Assuming that the DAO returns the updated user object
+            jest.spyOn(UserDAO.prototype, "updateUserInfo").mockResolvedValueOnce(testCustomer);
+            //Call the updateUserInfo method of the controller with the test user object
+            const response = userController.updateUserInfo(
+                testCustomer, 
+                testCustomer.name, 
+                testCustomer.surname, 
+                testCustomer.address, 
+                testCustomer.birthdate, 
+                'other-customer-username'
+            );
+        
+            await expect(response).rejects.toStrictEqual(new UnauthorizedUserError());
+        });
+
+        test("Customer tries to insert a birthdate > today - should return DateError", async () => {
+            // Assuming that the DAO returns the updated user object
+            jest.spyOn(UserDAO.prototype, "updateUserInfo").mockResolvedValueOnce(testCustomer);
+            //Call the updateUserInfo method of the controller with the test user object
+            const response = userController.updateUserInfo(
+                testCustomer, 
+                testCustomer.name, 
+                testCustomer.surname, 
+                testCustomer.address, 
+                '4024-06-11', 
+                'other-customer-username'
+            );
+        
+            await expect(response).rejects.toEqual(new DateError());
         });
     });
 });
