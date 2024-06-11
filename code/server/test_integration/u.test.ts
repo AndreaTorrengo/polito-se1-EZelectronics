@@ -124,9 +124,21 @@ describe("User routes integration tests", () => {
         })
 
         test("No user found error - 404", async () => {
-            customerCookie = await login(customer)
-            await request(app).get(`${routePath}/users`).set("Cookie", customerCookie).expect(401) //We call the same route but with the customer cookie. The 'expect' block must be changed to validate the error
-            await request(app).get(`${routePath}/users`).expect(401) //We can also call the route without any cookie. The result should be the same
+            let users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+            await request(app).delete(`${routePath}/users/`).set("Cookie", adminCookie).expect(200);
+            await request(app).delete(`${routePath}/users/${admin.username}`).set("Cookie", adminCookie).expect(200);
+            users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(0);
+            await request(app).get(`${routePath}/users/`).set("Cookie", adminCookie).expect(404);
+            await postUser(customer);
+            customerCookie = await login(customer);
         })
     })
 

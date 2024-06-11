@@ -122,7 +122,7 @@ describe("Unit tests for ReviewController", () => {
     });
   });
 
-  describe("deleteReviewsOfProduct(model)", () => {
+  describe("deleteAllReviews", () => {
     test("Success - should return void", async () => {
       const mockDAO = jest.spyOn(ReviewDAO.prototype, "deleteReviews").mockResolvedValueOnce();
 

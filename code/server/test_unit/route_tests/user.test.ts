@@ -224,7 +224,7 @@ describe("Unit test for userRoutes", () => {
   });
 
   describe("Route for deleting all users", () => {
-    test("DELETE users/:username", async () => {
+    test("DELETE /users", async () => {
       jest.mock('express-validator', () => ({
         param: jest.fn().mockImplementation(() => ({
           isString: () => ({ isLength: () => ({}) }),
