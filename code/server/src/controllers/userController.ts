@@ -53,6 +53,9 @@ class UserController {
         return new Promise<User[]>((resolve, reject) => {
             this.dao.getUsers().then(userArray => {
                 const userFiltered = [...userArray].filter(user => user.role == Utility.getRole(role))
+                if(userFiltered.length === 0){
+                    throw new UserNotFoundError;
+                }
                 resolve(userFiltered);
             }).catch(error => {
                 reject(error)

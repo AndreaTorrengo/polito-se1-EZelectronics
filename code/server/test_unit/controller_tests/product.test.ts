@@ -6,7 +6,7 @@ import { EmptyProductStockError, LowProductStockError, ProductAlreadyExistsError
 import ProductController from "../../src/controllers/productController";
 import { DateError } from "../../src/utilities";
 
-jest.mock("../../src/dao/productDao");
+jest.mock("../../src/dao/productDAO");
 let productController: ProductController;
 
 describe("test registrazione prodotto", ()=>{
