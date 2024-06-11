@@ -192,36 +192,6 @@ class CartDAO {
           const cartId = await this.getCurrentCartId(username);
           const result = await this.editProductInCartQuantity(cartId, username, model, 1);
           resolve(result);
-          /*if (cartId === undefined) {
-            //cart does not exists
-            //(create cart and add product with quantity 1)
-            resolve(await this.createNewCart(username, rowProductId.productID));
-          } else {
-            //cart exists
-            sql = "SELECT * FROM cartProducts WHERE cartID=? AND productID=?";
-            db.get(sql, [cartId, rowProductId.productID], async (err, row) => {
-              if (err) {
-                reject(err);
-              } else if (row === undefined) {
-                //product not in cart
-                //(add product in cart with quantity 1)
-                resolve(await this.insertNewProductInCart(cartId, rowProductId.productID, 1))
-              } else {
-                //product already in cart
-                //(add 1 to the quantity of existing product)
-                sql = "UPDATE cartProducts SET quantity = quantity + 1 WHERE cartID=? AND productID=?";
-                db.run(sql, [cartId, rowProductId.productID], function (err) {
-                  if(err){
-                    reject(err);
-                  } else if(this.changes === 0) {
-                    resolve(false);
-                  } else {
-                    resolve(true);
-                  }
-                });
-              }
-            });
-          }*/
         }
       });
     });
