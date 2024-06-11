@@ -137,9 +137,168 @@ describe("User routes integration tests", () => {
             expect(adm.surname).toBe(admin.surname)
         })
 
-        test("It should fail if the role is not valid", async () => {
+        test("The role is not valid - 422", async () => {
             //Invalid route parameters can be sent and tested in this way. The 'expect' block should contain the corresponding code
             await request(app).get(`${routePath}/users/roles/Invalid`).set("Cookie", adminCookie).expect(422)
         })
+
+        test("It should return a 401 error code if the user is not an Admin", async () => {
+            customerCookie = await login(customer); //?
+            await request(app).get(`${routePath}/users/roles/Admin`).set("Cookie", customerCookie).expect(401)
+        })
+
+        test("User not found - 404", async () => {
+            await request(app).get(`${routePath}/users/roles/Manager`).set("Cookie", adminCookie).expect(404)
+        })
     })
+
+    describe("GET /users/:username", () => {
+        test("It should return the user", async () => {
+            //Route parameters are set in this way by placing directly the value in the path
+            //It is not possible to send an empty value for the role (/users/roles/ will not be recognized as an existing route, it will return 404)
+            //Empty route parameters cannot be tested in this way, but there should be a validation block for them in the route
+            const testCustomer = await request(app).get(`${routePath}/users/${customer.username}`).set("Cookie", adminCookie).expect(200)
+            let cst = testCustomer.body
+            expect(cst.role).toBe(customer.role)
+            expect(cst.name).toBe(customer.name)
+            expect(cst.surname).toBe(customer.surname)
+        })
+
+        test("It should return a 401 error code if the user is not an Admin", async () => {
+            await request(app).get(`${routePath}/users/${admin.username}`).set("Cookie", customerCookie).expect(401)
+        })
+
+        test("User not found - 404", async () => {
+            await request(app).get(`${routePath}/users/testUsername`).set("Cookie", adminCookie).expect(404)
+        })
+    })
+
+    describe("DELETE /users/:username", () => {
+        test("It should delete a user", async () => {
+            let users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+            await request(app).delete(`${routePath}/users/${customer.username}`).set("Cookie", adminCookie).expect(200);
+            users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(1);
+            await postUser(customer);
+            customerCookie = await login(customer);
+        })
+
+        test("It should return a 401 error code if the user is not an Admin", async () => {
+            let users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+            await request(app).delete(`${routePath}/users/${admin.username}`).set("Cookie", customerCookie).expect(401);
+            users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+        })
+    })
+
+    describe("DELETE /users/", () => {
+        test("It should delete a user", async () => {
+            let users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+            await request(app).delete(`${routePath}/users/`).set("Cookie", adminCookie).expect(200);
+            users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(1);
+            await postUser(customer);
+            customerCookie = await login(customer);
+        })
+
+        test("It should return a 401 error code if the user is not an Admin", async () => {
+            let users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+            await request(app).delete(`${routePath}/users/`).set("Cookie", customerCookie).expect(401);
+            users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+        })
+
+        test("No user found", async () => {
+            let users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+            await request(app).delete(`${routePath}/users/`).set("Cookie", adminCookie).expect(200);
+            users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(1);
+            await request(app).delete(`${routePath}/users/`).set("Cookie", adminCookie).expect(404);
+            await postUser(customer);
+            customerCookie = await login(customer);
+        })
+    })
+
+    describe("PATCH /users/:username", () => {
+        test("It should modify the user", async () => {
+            let users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(2);
+            const inputParams = {name: "newName", surname: "newSurname", address: "newAddress", birthdate: "01/01/1990"};
+            await request(app).patch(`${routePath}/users/${customer.username}`).set("Cookie", adminCookie).send(inputParams).expect(200);
+            users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users/${customer.username}`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            let cust = users.body;
+            expect(cust).toBeDefined() //We expect the user we have created to exist in the array. The parameter should also be equal to those we have sent
+            expect(cust.name).toBe(inputParams.name)
+            expect(cust.surname).toBe(inputParams.surname)
+            expect(cust.address).toBe(inputParams.address)
+            expect(cust.birthdate).toBe(inputParams.birthdate)
+            await request(app).delete(`${routePath}/users/`).set("Cookie", adminCookie).expect(200);
+            users = await request(app) //It is possible to assign the response to a variable and use it later. 
+                .get(`${routePath}/users`)
+                .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
+                .expect(200)
+            expect(users.body).toHaveLength(1);
+            await postUser(customer);
+            customerCookie = await login(customer);
+        })
+
+        test("It should return a 401 error code if the user is not an Admin", async () => {
+            const inputParams = {name: "newName", surname: "newSurname", address: "newAddress", birthdate: "1990-01-01"};
+            await request(app).patch(`${routePath}/users/${admin.username}`).set("Cookie", customerCookie).send(inputParams).expect(401);
+        })
+
+        test("User not found - 404", async () => {
+            const inputParams = {name: "newName", surname: "newSurname", address: "newAddress", birthdate: "1990-01-01"};
+            await request(app).patch(`${routePath}/users/testUsername`).set("Cookie", adminCookie).send(inputParams).expect(404);
+        })
+
+        test("Date after the current date - 400", async () => {
+            const inputParams = {name: "newName", surname: "newSurname", address: "newAddress", birthdate: "3000-01-01"};
+            await request(app).patch(`${routePath}/users/${customer.username}`).set("Cookie", adminCookie).send(inputParams).expect(400);
+        })
+
+    })
+
+
 })
