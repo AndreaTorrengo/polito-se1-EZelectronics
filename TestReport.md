@@ -93,18 +93,14 @@ Una volta passati gli unit test, si è proseguito alla realizzazione degli integ
 
 ## Controller carts
 
-| Test case name | Object(s) tested | Test level | Technique used |
-| :------------: | :--------------: | :--------: | :------------: |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
+|                    Test case name                    |                                                                                         Object(s) tested                                                                                          | Test level | Technique used |
+| :--------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------: | :------------: |
+|         Aggiunta nuovo prodotto al carrello          |                                                 Test che verifica che il prodotto da aggiungere sia valido e disponibile (quantità in stock > 0)                                                  |    Unit    |    WhiteBox    |
+| Visualizzazione carrello corrente e carrelli passati |                                Test che verifica la visualizzazione del carrello corrente (eventualmente vuoto) e dei carrelli passati (eventualmente inesistenti)                                |    Unit    |    WhiteBox    |
+|           Rimozione prodotto dal carrello            |                                                       Test che verifica che il prodotto da rimuovere sia valido e all'interno del carrello                                                        |    Unit    |    WhiteBox    |
+|                 Svuotamento carrello                 |                                                                             Test che verifica che il carrello esiste                                                                              |    Unit    |    WhiteBox    |
+|    Cancellazione dei carrelli di tutti gli utenti    |                                                                          Test per verificare la funzionalità specificata                                                                          |    Unit    |    WhiteBox    |
+|                  Checkout carrello                   | Test che verifica l'esistenza del carrello, che non deve essere vuoto. Se almeno una quantità richiesta di un prodotto nel carrello supera la quantità disponibile in stock, il checkout fallisce |    Unit    |    WhiteBox    |
 
 ## Controller reviews
 
@@ -164,18 +160,18 @@ Una volta passati gli unit test, si è proseguito alla realizzazione degli integ
 
 ## DAO users
 
-| Test case name | Object(s) tested | Test level | Technique used |
-| :------------: | :--------------: | :--------: | :------------: |
-| Visualizzazione utenti autenticati               | Test che restituisce se un utente è autenticato, che la password sia valida, che non ci sia un utente con lo stesso username o errori nel db                  |    Unit    |    WhiteBox    |
-| Creazione utenti                |  Test che crea un utente, verifica che l'utente non esista e che non ci sia errori nel db                |    Unit    |    WhiteBox    |
-|  Visualizza utenti dato username              | Test che visualizza utenti dato un username, verifica che l'username fornito esista e non ci siano errori nel db                   |    Unit    |    WhiteBox    |
-|  Visualizzazione utenti              | Test che restituisce gli user, verifica che ci siano ed errori nel db                  |    Unit    |    WhiteBox    |
-|   Cancella utente             | Test che cancella un utente specifico, verifica che esiste e che non ci siano errori nel db                  |    Unit    |    WhiteBox    |
-|   Cancella tutti gli utenti             | Test che cancella tutti gli utenti, verifica che ci siano user e non ci siano errori nel db                 |    Unit    |    WhiteBox    |
-| Aggiornamento dati utenti               | Test che aggiorna i dati di un utente, verifica che esista l'utente e che non ci siano errori nel db                   |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
-|                |                  |    Unit    |    WhiteBox    |
+|           Test case name           |                                                               Object(s) tested                                                               | Test level | Technique used |
+| :--------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------: | :--------: | :------------: |
+| Visualizzazione utenti autenticati | Test che restituisce se un utente è autenticato, che la password sia valida, che non ci sia un utente con lo stesso username o errori nel db |    Unit    |    WhiteBox    |
+|          Creazione utenti          |                           Test che crea un utente, verifica che l'utente non esista e che non ci sia errori nel db                           |    Unit    |    WhiteBox    |
+|  Visualizza utenti dato username   |               Test che visualizza utenti dato un username, verifica che l'username fornito esista e non ci siano errori nel db               |    Unit    |    WhiteBox    |
+|       Visualizzazione utenti       |                                    Test che restituisce gli user, verifica che ci siano ed errori nel db                                     |    Unit    |    WhiteBox    |
+|          Cancella utente           |                         Test che cancella un utente specifico, verifica che esiste e che non ci siano errori nel db                          |    Unit    |    WhiteBox    |
+|     Cancella tutti gli utenti      |                         Test che cancella tutti gli utenti, verifica che ci siano user e non ci siano errori nel db                          |    Unit    |    WhiteBox    |
+|     Aggiornamento dati utenti      |                     Test che aggiorna i dati di un utente, verifica che esista l'utente e che non ci siano errori nel db                     |    Unit    |    WhiteBox    |
+|                                    |                                                                                                                                              |    Unit    |    WhiteBox    |
+|                                    |                                                                                                                                              |    Unit    |    WhiteBox    |
+|                                    |                                                                                                                                              |    Unit    |    WhiteBox    |
 
 # Coverage
 
@@ -192,3 +188,8 @@ Una volta passati gli unit test, si è proseguito alla realizzazione degli integ
 ## Coverage white box
 
 Report here the screenshot of coverage values obtained with jest-- coverage
+
+The following coverage stats has been generated by this npm command:
+> npm test -- --coverage
+
+![Alt text](./images/testReportJestCoverageScreen.png)
