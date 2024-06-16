@@ -1,6 +1,5 @@
 # Test Report
 
-<The goal of this document is to explain how the application was tested, detailing how the test cases were defined and what they cover>
 
 # Contents
 
