@@ -26,6 +26,28 @@ class Utility {
         return user.role === Role.ADMIN
     }
 
+    /**
+     * @param roleString - The role string stored in the database ('Customer', 'Manager' or 'Admin')
+     * @returns Corresponding Role entry inside Role enum
+     */
+    static getRole(roleString: string): Role {
+        try {
+            switch(roleString) {
+                case 'Customer' : return Role.CUSTOMER;
+                case 'Manager'  : return Role.MANAGER;
+                case 'Admin'    : return Role.ADMIN;
+                default         : throw Error;
+            }
+        } catch {
+            console.error(`Could not parse the role-string '${roleString}' into Role enum`);
+            return null;
+        }
+    }
+
+    static now(): string {
+        return new Date().toISOString().split("T")[0];
+    };
+
 }
 
 class DateError extends Error {
