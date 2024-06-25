@@ -154,6 +154,7 @@ describe("Unit tests for UserController", () => {
     describe("deleteUser(...)", () => {
         test("Success - should return true", async () => {
             jest.spyOn(UserDAO.prototype, "deleteUser").mockResolvedValueOnce(true);
+            jest.spyOn(UserDAO.prototype, "getUserByUsername").mockResolvedValueOnce(testCustomer);
             const response = await userController.deleteUser(testAdmin, testCustomer.username);
             expect(UserDAO.prototype.deleteUser).toHaveBeenCalled();
             expect(response).toStrictEqual(true);
@@ -162,6 +163,7 @@ describe("Unit tests for UserController", () => {
         test("Generic error from DAO", async () => {
             const err = new Error('DAO error');   // simulate a DAO fail
             jest.spyOn(UserDAO.prototype, "deleteUser").mockRejectedValueOnce(err);
+            jest.spyOn(UserDAO.prototype, "getUserByUsername").mockResolvedValueOnce(testCustomer);
             const response = userController.deleteUser(testAdmin, testCustomer.username);
             await expect(response).rejects.toEqual(err);
             expect(UserDAO.prototype.deleteUser).toHaveBeenCalled();
