@@ -112,7 +112,8 @@ class UserController {
         return new Promise<Boolean>((resolve, reject) => {
             // User is admin || User wants to delete himself
             if( Utility.isAdmin(user) || user.username == username )
-                resolve(this.dao.deleteUser(username));
+                this.dao.getUserByUsername(username)
+                    .then(user => user.role != 'Admin' ? resolve(this.dao.deleteUser(username)) : reject(new UnauthorizedUserError)).catch(err => reject(err));
             else reject(new UserNotAdminError);
         });
     }

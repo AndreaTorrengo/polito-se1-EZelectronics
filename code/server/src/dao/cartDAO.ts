@@ -227,7 +227,7 @@ class CartDAO {
    */
   getProductIdFromModel(model: String): Promise<Number> {
     return new Promise<Number>((resolve, reject) => {
-      let sql = "SELECT productID FROM products WHERE quantity>0 AND model=?";
+      let sql = "SELECT productID FROM products WHERE model=?";
       db.get(sql, [model], async (errProductId, rowProduct: any) => {
         if (errProductId) {
           reject(errProductId);
