@@ -82,8 +82,6 @@ class ProductController {
           throw new ProductNotFoundError();
         }
 
-        console.log(changeDate, Utility.now(), oldProduct.arrivalDate);
-
         if (changeDate && (changeDate > Utility.now() || changeDate < oldProduct.arrivalDate)) {
           throw new DateError();
         }
