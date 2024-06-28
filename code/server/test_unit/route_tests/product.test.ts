@@ -42,10 +42,11 @@ describe("Route unit tests", ()=>{
                     isFloat: ()=>({ isLength:()=>({})}),
                     isISO8601: ()=>({ isLength:()=>({})}),
                     notEmpty: ()=>({ isLength:()=>({})}),
+                    optional: ()=>({ isLength:()=>({})}),
                 })),
             }))
             jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next() );
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
 
             jest.spyOn(ProductController.prototype, "registerProducts").mockResolvedValueOnce();
             const response = await request(app).post(baseURL + "/products").send(inputProduct)
@@ -67,6 +68,7 @@ describe("Route unit tests", ()=>{
                     isFloat: ()=>({ isLength:()=>({})}),
                     isISO8601: ()=>({ isLength:()=>({})}),
                     notEmpty: ()=>({ isLength:()=>({})}),
+                    optional: ()=>({ isLength:()=>({})}),
                 })),
             }))
             jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => {
@@ -74,7 +76,7 @@ describe("Route unit tests", ()=>{
                 return res.status(409).json({ errors });
             });
 
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
 
             jest.spyOn(ProductController.prototype, "registerProducts").mockRejectedValueOnce(new ProductAlreadyExistsError());
             const response = await request(app).post(baseURL + "/products").send(inputProduct2);
@@ -92,6 +94,7 @@ describe("Route unit tests", ()=>{
                     isFloat: ()=>({ isLength:()=>({})}),
                     isISO8601: ()=>({ isLength:()=>({})}),
                     notEmpty: ()=>({ isLength:()=>({})}),
+                    optional: ()=>({ isLength:()=>({})}),
                 })),
             }));
 
@@ -99,7 +102,8 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'data error' }];
                 return res.status(400).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
+
             jest.spyOn(ProductController.prototype, "registerProducts").mockRejectedValueOnce(new DateError());
             const response = await request(app).post(baseURL + "/products").send(inputProduct);
             expect(response.status).toBe(400);
@@ -135,7 +139,7 @@ describe("Route unit tests", ()=>{
                 })),
             }))
             jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next() );
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             const newinputProduct={quantity: 15, changeDate: "2023-02-01"};
             jest.spyOn(ProductController.prototype, "changeProductQuantity").mockResolvedValueOnce(inputProduct.quantity+inputProduct2.quantity);
             const response = await request(app).patch(baseURL + `/products/${inputProduct.model}`).send(newinputProduct);
@@ -166,7 +170,7 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'data error' }];
                 return res.status(400).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "changeProductQuantity").mockRejectedValueOnce(new DateError());
             const response = await request(app).patch(baseURL + `/products/${inputProduct.model}`).send(newinputProduct)
        //     console.log("Response Status:", response.status);
@@ -198,7 +202,7 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'data error' }];
                 return res.status(400).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "changeProductQuantity").mockRejectedValueOnce(new DateError());
             const response = await request(app).patch(baseURL + `/products/${inputProduct.model}`).send(newinputProduct)
             expect(response.status).toBe(400);
@@ -227,7 +231,7 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'product not found' }];
                 return res.status(404).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "changeProductQuantity").mockRejectedValueOnce(new ProductNotFoundError());
             const response = await request(app).patch(baseURL + `/products/errore404`).send(newinputProduct)
             expect(response.status).toBe(404);
@@ -264,7 +268,7 @@ describe("Route unit tests", ()=>{
                 })),
             }))
             jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next() );
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             const newinputProduct={quantity: 5, sellingDate: "2023-02-01"};
             jest.spyOn(ProductController.prototype, "sellProduct").mockResolvedValueOnce(inputProduct2.quantity-inputProduct.quantity);
             const response = await request(app).patch(baseURL + `/products/${inputProduct.model}/sell`).send(newinputProduct);
@@ -294,7 +298,7 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'product not found' }];
                 return res.status(404).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "sellProduct").mockRejectedValueOnce(new ProductNotFoundError());
             const response = await request(app).patch(baseURL + `/products/errore404/sell`).send(newinputProduct)
         /*    console.log("Response Status:", response.status);
@@ -324,7 +328,7 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'data error' }];
                 return res.status(400).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "sellProduct").mockRejectedValueOnce(new DateError());
             const response = await request(app).patch(baseURL + `/products/${inputProduct.model}/sell`).send(newinputProduct)
        //     console.log("Response Status:", response.status);
@@ -356,7 +360,7 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'data error' }];
                 return res.status(400).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "sellProduct").mockRejectedValueOnce(new DateError());
             const response = await request(app).patch(baseURL + `/products/${inputProduct.model}/sell`).send(newinputProduct)
             expect(response.status).toBe(400);
@@ -384,7 +388,7 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'product sold out' }];
                 return res.status(409).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "sellProduct").mockRejectedValueOnce(new EmptyProductStockError());
             const response = await request(app).patch(baseURL + `/products/${inputProduct.model}/sell`).send(newinputProduct)
             expect(response.status).toBe(409);
@@ -413,7 +417,7 @@ describe("Route unit tests", ()=>{
                 const errors = [{ msg: 'product sold out' }];
                 return res.status(409).json({ errors });
             });
-            jest.spyOn(Authenticator.prototype, "isManager").mockImplementation((req, res, next) => {return next()});
+            jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "sellProduct").mockRejectedValueOnce(new LowProductStockError());
             const response = await request(app).patch(baseURL + `/products/${inputProduct.model}/sell`).send(newinputProduct)
             expect(response.status).toBe(409);
@@ -441,18 +445,19 @@ describe("Route unit tests", ()=>{
                     exists: ()=>({ isLength:()=>({})}),
                     isString: ()=>({ isLength:()=>({})}),
                     notEmpty: ()=>({ isLength:()=>({})}),
+                    oneOf: ()=>({ isLength:()=>({})}),
                     values: ()=>({ isLength:()=>({})}),
                 })),
             }));
-            const inputChoice={grouping: "model", category: "", model:"provasuccesso"}
+            const inputChoice={grouping: "model", model:"provasuccesso"}
             jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next() );
             jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "getProducts").mockResolvedValueOnce(inputProduct);
-            const response = await request(app).get(baseURL + `/products?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`);
+            const response = await request(app).get(baseURL + `/products?grouping=${inputChoice.grouping}&model=${inputChoice.model}`);
             expect(response.status).toBe(200)
             expect(response.body).toEqual(inputProduct);
             expect(ProductController.prototype.getProducts).toBeCalledTimes(1)
-            expect(ProductController.prototype.getProducts).toHaveBeenCalledWith(inputChoice.grouping, inputChoice.category, inputChoice.model);        
+            expect(ProductController.prototype.getProducts).toHaveBeenCalledWith(inputChoice.grouping, undefined, inputChoice.model);        
 
         });
 
@@ -465,6 +470,7 @@ describe("Route unit tests", ()=>{
                     isIn: () => ({ isLength: () => ({}) }),
                     not: ()=>({ isLength:()=>({})}),
                     exists: ()=>({ isLength:()=>({})}),
+                    oneOf: ()=>({ isLength:()=>({})}),
                     isString: ()=>({ isLength:()=>({})}),
                     notEmpty: ()=>({ isLength:()=>({})}),
                     values: ()=>({ isLength:()=>({})}),
@@ -489,6 +495,7 @@ describe("Route unit tests", ()=>{
                     equals: () => ({ isLength: () => ({}) }),
                     isIn: () => ({ isLength: () => ({}) }),
                     not: ()=>({ isLength:()=>({})}),
+                    oneOf: ()=>({ isLength:()=>({})}),
                     exists: ()=>({ isLength:()=>({})}),
                     isString: ()=>({ isLength:()=>({})}),
                     notEmpty: ()=>({ isLength:()=>({})}),
@@ -518,6 +525,7 @@ describe("Route unit tests", ()=>{
                     exists: ()=>({ isLength:()=>({})}),
                     isString: ()=>({ isLength:()=>({})}),
                     notEmpty: ()=>({ isLength:()=>({})}),
+                    oneOf: ()=>({ isLength:()=>({})}),
                     values: ()=>({ isLength:()=>({})}),
                 })),
             }));
@@ -543,17 +551,18 @@ describe("Route unit tests", ()=>{
                     exists: ()=>({ isLength:()=>({})}),
                     isString: ()=>({ isLength:()=>({})}),
                     notEmpty: ()=>({ isLength:()=>({})}),
+                    oneOf: ()=>({ isLength:()=>({})}),
                     values: ()=>({ isLength:()=>({})}),
                 })),
             }));
-            const inputChoice={grouping: "model", category: "", model:"prova404"}
+            const inputChoice={grouping: "model", model:"prova404"}
             jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => {
                 const errors = [{ msg: 'invalid input' }];
                 return res.status(404).json({ errors });
             });
             jest.spyOn(Authenticator.prototype, "isAdminOrManager").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "getProducts").mockRejectedValueOnce(new ProductNotFoundError());
-            const response = await request(app).get(baseURL + `/products?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`);
+            const response = await request(app).get(baseURL + `/products?grouping=${inputChoice.grouping}&model=${inputChoice.model}`);
             expect(response.status).toBe(404);
             expect(ProductController.prototype.getProducts).toBeCalledTimes(1);
         });
@@ -588,15 +597,15 @@ describe("Route unit tests", ()=>{
                     values: ()=>({ isLength:()=>({})}),
                 })),
             }));
-            const inputChoice={grouping: "model", category: "", model:"provasuccesso"}
+            const inputChoice={grouping: "model", model:"provasuccesso"}
             jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next() );
             jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "getAvailableProducts").mockResolvedValueOnce(inputProduct);
-            const response = await request(app).get(baseURL + `/products/available?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`);
+            const response = await request(app).get(baseURL + `/products/available?grouping=${inputChoice.grouping}&model=${inputChoice.model}`);
             expect(response.status).toBe(200)
             expect(response.body).toEqual(inputProduct);
             expect(ProductController.prototype.getAvailableProducts).toBeCalledTimes(1)
-            expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalledWith(inputChoice.grouping, inputChoice.category, inputChoice.model);        
+            expect(ProductController.prototype.getAvailableProducts).toHaveBeenCalledWith(inputChoice.grouping, undefined, inputChoice.model);        
 
         });
 
@@ -690,14 +699,14 @@ describe("Route unit tests", ()=>{
                     values: ()=>({ isLength:()=>({})}),
                 })),
             }));
-            const inputChoice={grouping: "model", category: "", model:"prova404"}
+            const inputChoice={grouping: "model", model:"prova404"}
             jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => {
                 const errors = [{ msg: 'invalid input' }];
                 return res.status(404).json({ errors });
             });
             jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {return next()});
             jest.spyOn(ProductController.prototype, "getAvailableProducts").mockRejectedValueOnce(new ProductNotFoundError());
-            const response = await request(app).get(baseURL + `/products/available?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`);
+            const response = await request(app).get(baseURL + `/products/available?grouping=${inputChoice.grouping}&model=${inputChoice.model}`);
             expect(response.status).toBe(404);
             expect(ProductController.prototype.getAvailableProducts).toBeCalledTimes(1);
         });
