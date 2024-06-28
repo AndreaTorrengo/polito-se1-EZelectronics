@@ -57,7 +57,7 @@ class ProductRoutes {
      */
     this.router.post(
       "/",
-      this.authenticator.isManager,
+      this.authenticator.isAdminOrManager,
       body("model").isString().notEmpty(),
       body("category").isIn(Object.values(Category)),
       body("quantity").isInt({ min: 1 }),
@@ -90,7 +90,7 @@ class ProductRoutes {
      */
     this.router.patch(
       "/:model",
-      this.authenticator.isManager,
+      this.authenticator.isAdminOrManager,
       param("model").isString().notEmpty(),
       body("quantity").isInt({ min: 1 }),
       body("changeDate").optional({ nullable: true }).isISO8601({ strict: true }),
@@ -113,7 +113,7 @@ class ProductRoutes {
      */
     this.router.patch(
       "/:model/sell",
-      this.authenticator.isManager,
+      this.authenticator.isAdminOrManager,
       param("model").isString().notEmpty(),
       body("quantity").isInt({ min: 1 }),
       body("sellingDate").optional({ nullable: true }).isISO8601({ strict: true }),
@@ -138,8 +138,16 @@ class ProductRoutes {
       "/",
       this.authenticator.isAdminOrManager,
       oneOf([
-        [query("grouping").equals("category"), query("category").isIn(Object.values(Category))],
-        [query("grouping").equals("model"), query("model").isString().notEmpty()],
+        [
+          query("grouping").equals("category"),
+          query("category").isIn(Object.values(Category)),
+          query("model").not().exists(),
+        ],
+        [
+          query("grouping").equals("model"),
+          query("model").isString().notEmpty(),
+          query("category").not().exists(),
+        ],
         [query("grouping").not().exists(), query("category").not().exists(), query("model").not().exists()],
       ]),
       this.errorHandler.validateRequest,
@@ -165,8 +173,16 @@ class ProductRoutes {
       "/available",
       this.authenticator.isLoggedIn,
       oneOf([
-        [query("grouping").equals("category"), query("category").isIn(Object.values(Category))],
-        [query("grouping").equals("model"), query("model").isString().notEmpty()],
+        [
+          query("grouping").equals("category"),
+          query("category").isIn(Object.values(Category)),
+          query("model").not().exists(),
+        ],
+        [
+          query("grouping").equals("model"),
+          query("model").isString().notEmpty(),
+          query("category").not().exists(),
+        ],
         [query("grouping").not().exists(), query("category").not().exists(), query("model").not().exists()],
       ]),
       this.errorHandler.validateRequest,
