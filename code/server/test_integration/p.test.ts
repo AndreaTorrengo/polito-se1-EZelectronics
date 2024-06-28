@@ -270,7 +270,7 @@ describe("GET /products", ()=>{
   test("It should return a 200 success get all Products", async () => {
       const inputProduct = [{ sellingPrice: 57.00, model: "P2", category: Category.LAPTOP, arrivalDate: "2015-01-01", details: "test", quantity: 10 }]
       const inputChoice={grouping: "model", category: "", model:"P2"}
-      const response = await request(app).get(baseURLProduct + `?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`).set("Cookie",adminCookie);  //da cambiare in admin e manager
+      const response = await request(app).get(baseURLProduct + `?grouping=${inputChoice.grouping}&model=${inputChoice.model}`).set("Cookie",adminCookie);  //da cambiare in admin e manager
       expect(response.status).toBe(200)
   });
 
@@ -300,7 +300,7 @@ describe("GET /products", ()=>{
   test("It should return a 404 error code model not existing", async () => {
       const inputProduct = [{ sellingPrice: 57.00, model: "prova404", category: Category.LAPTOP, arrivalDate: "2015-01-01", details: "test", quantity: 10 }]
       const inputChoice={grouping: "model", category: "", model:"prova404"}
-      const response = await request(app).get(baseURLProduct + `?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`).set("Cookie",adminCookie);  //da cambiare in admin e manager
+      const response = await request(app).get(baseURLProduct + `?grouping=${inputChoice.grouping}&model=${inputChoice.model}`).set("Cookie",adminCookie);  //da cambiare in admin e manager
       expect(response.status).toBe(404);
   });
 });
@@ -311,7 +311,7 @@ describe("GET /products/available", ()=>{
   test("It should return a 200 success get all Products", async () => {
       const inputProduct = [{ sellingPrice: 57.00, model: "P2", category: Category.LAPTOP, arrivalDate: "2015-01-01", details: "test", quantity: 10 }]
       const inputChoice={grouping: "model", category: "", model:"P2"}
-      const response = await request(app).get(baseURLProduct + `/available?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`).set("Cookie",customerCookie); //aggiustare la condizione è isLogged in
+      const response = await request(app).get(baseURLProduct + `/available?grouping=${inputChoice.grouping}&model=${inputChoice.model}`).set("Cookie",customerCookie); //aggiustare la condizione è isLogged in
       expect(response.status).toBe(200)
   });
 
@@ -342,7 +342,7 @@ describe("GET /products/available", ()=>{
   test("It should return a 404 error code model not existing", async () => {
       const inputProduct = [{ sellingPrice: 57.00, model: "prova404", category: Category.LAPTOP, arrivalDate: "2015-01-01", details: "test", quantity: 10 }]
       const inputChoice={grouping: "model", category: "", model:"prova404"}
-      const response = await request(app).get(baseURLProduct + `/available?grouping=${inputChoice.grouping}&category=${inputChoice.category}&model=${inputChoice.model}`).set("Cookie",customerCookie); //aggiustare la condizione è isLogged in
+      const response = await request(app).get(baseURLProduct + `/available?grouping=${inputChoice.grouping}&model=${inputChoice.model}`).set("Cookie",customerCookie); //aggiustare la condizione è isLogged in
       expect(response.status).toBe(404);
   });
 });
