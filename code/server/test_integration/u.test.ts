@@ -261,7 +261,7 @@ describe("User routes integration tests", () => {
                 .set("Cookie", adminCookie) //Authentication is specified with the 'set' block. Adding a cookie to the request will allow authentication (if the cookie has been created with the correct login route). Without this cookie, the request will be unauthorized
                 .expect(200)
             expect(users.body).toHaveLength(2);
-            const inputParams = {name: "newName", surname: "newSurname", address: "newAddress", birthdate: "01/01/1990"};
+            const inputParams = {name: "newName", surname: "newSurname", address: "newAddress", birthdate: "1990-01-01"};
             await request(app).patch(`${routePath}/users/${customer.username}`).set("Cookie", adminCookie).send(inputParams).expect(200);
             users = await request(app) //It is possible to assign the response to a variable and use it later. 
                 .get(`${routePath}/users/${customer.username}`)
