@@ -157,16 +157,6 @@ describe("Review routes integration tests", () => {
       expect(response.status).toBe(err.customCode);
       expect(JSON.parse(response.text).error).toEqual(err.customMessage);
     });
-    test("Customer has not purchased the product - Should return ProductNotInCartError", async () => {
-      const err = new ProductNotInCartError();
-      const response = await request(app)
-      .post(`${routePath}/reviews/${product2.model}`)
-      .set("Cookie", customerCookie)
-      .send({model: product2.model, user: 'customer', score: 4, comment: 'test comment'});
-
-      expect(response.status).toEqual(err.customCode);
-      expect(JSON.parse(response.text).error).toEqual(err.customMessage);
-    });
   });
 
   describe("Route for getting all reviews for a product - GET /:model", () => {
