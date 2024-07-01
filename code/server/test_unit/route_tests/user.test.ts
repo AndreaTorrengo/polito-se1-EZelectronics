@@ -271,7 +271,7 @@ describe("Unit test for userRoutes", () => {
 
   describe("Route for updating the information of a user", () => {
     test("PATCH users/:username", async () => {
-      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "01/01/1970" };
+      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "1970-01-01" };
       const testModifiedUser = new User(testCustomer.username, testUser.name, testUser.surname, testCustomer.role, testUser.address, testUser.birthdate);
       jest.mock('express-validator', () => ({
         param: jest.fn().mockImplementation(() => ({
@@ -301,7 +301,7 @@ describe("Unit test for userRoutes", () => {
     });
 
     test("Unauthorized user. Should return 401", async () => {
-      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "01/01/1970" };
+      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "1970-01-01" };
       jest.spyOn(ErrorHandler.prototype, "validateRequest").mockImplementation((req, res, next) => next());
       jest.spyOn(Authenticator.prototype, "isAdmin").mockImplementation((req, res, next) => next());
       jest.spyOn(UserController.prototype, "updateUserInfo").mockRejectedValueOnce(new UnauthorizedUserError());
@@ -311,7 +311,7 @@ describe("Unit test for userRoutes", () => {
     });
     
     test("No existing user", async () => {
-      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "01/01/1970" };
+      const testUser = { name: "test",surname: "test",address: "Corso Duca degli Abruzzi 129, Torino", birthdate: "1970-01-01" };
       jest.mock('express-validator', () => ({
         param: jest.fn().mockImplementation(() => ({
           isString: () => ({ isLength: () => ({}) }),

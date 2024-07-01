@@ -78,7 +78,7 @@ describe("cambio quantita", ()=>{
         const testProduct=new Product(89.00,"test modello", Category.LAPTOP,"2023-07-07","test descrizione",20);
         const testNewQuantity=30;
         const testModel= "test modello";
-        const newProductTest=new Product(89.00,"test modello", Category.LAPTOP,"2023-08-08","test descrizione",testNewQuantity+testProduct.quantity);
+        const newProductTest=new Product(89.00,"test modello", Category.LAPTOP,"2023-07-07","test descrizione",testNewQuantity+testProduct.quantity);
 
         jest.spyOn(ProductDAO.prototype, "getProductByModel").mockResolvedValueOnce(testProduct);
         jest.spyOn(ProductDAO.prototype, "updateProduct").mockResolvedValueOnce(true);

@@ -116,6 +116,10 @@ class CartController {
 
         const changes = await this.dao.checkoutUserCart(user.username);
 
+        if (changes.hasOwnProperty("error")) {
+          throw new CartNotFoundError();
+        }
+
         if (changes === 0) {
           resolve(false);
         }

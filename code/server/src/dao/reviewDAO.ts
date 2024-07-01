@@ -40,7 +40,7 @@ class ReviewDAO {
 
   addProductReview(model: string, username: String, score: number, comment: string, date: String) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT U.userID, P.productID FROM users AS U, products AS P, cart AS C, cartProducts AS CP WHERE U.userID=C.userID AND P.productID=CP.productID AND C.cartID=CP.cartID AND U.username = ? AND P.model = ? AND C.paid = 1";
+        let sql = "SELECT U.userID, P.productID FROM users AS U, products AS P WHERE U.username = ? AND P.model = ?";
         
         db.get(sql, [username, model], (err, row :any) => {
             if (err) {

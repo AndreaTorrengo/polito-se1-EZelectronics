@@ -168,7 +168,7 @@ class UserRoutes {
             body('name').isString().notEmpty(),
             body('surname').isString().notEmpty(),
             body('address').isString().notEmpty(),
-            body('birthdate').isString().notEmpty(),
+            body('birthdate').isDate().notEmpty(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => this.controller.updateUserInfo(req.user, req.body.name, req.body.surname, req.body.address, req.body.birthdate, req.params.username)
                 .then((user: any /**User */) => res.status(200).json(user))

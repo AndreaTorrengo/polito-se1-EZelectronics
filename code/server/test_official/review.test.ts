@@ -39,7 +39,7 @@ const createProduct = async (product: any, cookie: string) => {
 
 describe("Tests for Review Routes", () => {
     beforeAll(async () => {
-        await cleanup()
+        cleanup()
         //The cleanup function may not finish in time for the next operation, leading to potential issues
         //We wait 15 seconds before writing to the database, ensuring that the test suite contains what we need
         await new Promise(resolve => setTimeout(resolve, 15000))
@@ -59,7 +59,7 @@ describe("Tests for Review Routes", () => {
     })
 
     afterAll(async () => {
-        await cleanup()
+        cleanup()
     })
 
     describe("1. POST /reviews/:model", () => {

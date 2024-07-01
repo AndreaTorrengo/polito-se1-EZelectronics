@@ -82,9 +82,7 @@ class ProductController {
           throw new ProductNotFoundError();
         }
 
-        const date = changeDate ? changeDate : Utility.now();
-
-        if (date > Utility.now() || date < oldProduct.arrivalDate) {
+        if (changeDate && (changeDate > Utility.now() || changeDate < oldProduct.arrivalDate)) {
           throw new DateError();
         }
 
@@ -92,7 +90,7 @@ class ProductController {
           oldProduct.sellingPrice,
           model,
           oldProduct.category,
-          changeDate ? changeDate : new Date().toISOString().split("T")[0],
+          oldProduct.arrivalDate,
           oldProduct.details,
           newQuantity + oldProduct.quantity
         );
@@ -132,9 +130,7 @@ class ProductController {
           throw new LowProductStockError();
         }
 
-        const date = sellingDate ? sellingDate : Utility.now();
-
-        if (date > Utility.now() || date < oldProduct.arrivalDate) {
+        if (sellingDate && (sellingDate > Utility.now() || sellingDate < oldProduct.arrivalDate)) {
           throw new DateError();
         }
 
@@ -203,16 +199,18 @@ class ProductController {
   ): Promise<Product[]> {
     return new Promise(async (resolve, reject) => {
       try {
-        let products = (await this.dao.getProducts()).filter((p) => p.quantity > 0);
+        let products = await this.dao.getProducts();
 
         if (grouping === "category" && (category as Category)) {
-          products = products.filter((p) => p.category === category);
+          products = products.filter((p) => p.category === category && p.quantity > 0);
         } else if (grouping === "model" && model) {
-          products = products.filter((p) => p.model === model);
-
-          if (products.length === 0) {
+          if (!products.find((p) => p.model === model)) {
             throw new ProductNotFoundError();
           }
+
+          products = products.filter((p) => p.model === model && p.quantity > 0);
+        } else {
+          products = products.filter((p) => p.quantity > 0);
         }
 
         resolve(products);

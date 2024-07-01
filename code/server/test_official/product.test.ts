@@ -31,7 +31,7 @@ const login = async (userInfo: any) => {
 
 describe("Tests for Product Routes", () => {
     beforeAll(async () => {
-        await cleanup()
+        cleanup()
         //The cleanup function may not finish in time for the next operation, leading to potential issues
         //We wait 15 seconds before writing to the database, ensuring that the test suite contains what we need
         await new Promise(resolve => setTimeout(resolve, 15000))
@@ -45,7 +45,7 @@ describe("Tests for Product Routes", () => {
     })
 
     afterAll(async () => {
-        await cleanup()
+        cleanup()
     })
 
     describe("1. POST /products", () => {

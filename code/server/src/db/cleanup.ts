@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 import db from "../db/db";
 
@@ -7,14 +7,11 @@ import db from "../db/db";
  * This function must be called before any integration test, to ensure a clean database state for each test run.
  */
 
-export function cleanup() {return new Promise((resolve, reject )=> {
-    db.serialize(() => {
-        // Delete all data from the database.
-        db.run("DELETE FROM users")
-        //Add delete statements for other tables here
-        db.run("DELETE FROM products")
-    })
-    resolve(true)
-})
-    
+export function cleanup() {
+  db.serialize(() => {
+    // Delete all data from the database.
+    db.run("DELETE FROM users");
+    //Add delete statements for other tables here
+    db.run("DELETE FROM products");
+  });
 }

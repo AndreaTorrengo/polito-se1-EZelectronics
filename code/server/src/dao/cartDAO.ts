@@ -6,6 +6,7 @@ import { CartNotFoundError, EmptyCartError, ProductNotInCartError } from "../err
 import { Cart, ProductInCart } from "../components/cart";
 import db from "../db/db";
 import { ProductNotFoundError } from "../errors/productError";
+import { Utility } from "../utilities";
 
 const mapRowsToCart = (cartRows: any, productRows: any): Cart[] => {
   const carts: Cart[] = [];
@@ -208,8 +209,8 @@ class CartDAO {
         } else if (row === undefined) {
           resolve({ error: "This user doesn't have a current cart" });
         } else {
-          query = "UPDATE cart SET paid=1 WHERE cartID=?";
-          db.run(query, [row.cartID], function (err) {
+          query = "UPDATE cart SET paid=1, paymentDate=? WHERE cartID=?";
+          db.run(query, [Utility.now(), row.cartID], function (err) {
             if (err) {
               reject(err);
             } else {
@@ -227,7 +228,7 @@ class CartDAO {
    */
   getProductIdFromModel(model: String): Promise<Number> {
     return new Promise<Number>((resolve, reject) => {
-      let sql = "SELECT productID FROM products WHERE quantity>0 AND model=?";
+      let sql = "SELECT productID FROM products WHERE model=?";
       db.get(sql, [model], async (errProductId, rowProduct: any) => {
         if (errProductId) {
           reject(errProductId);
